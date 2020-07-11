@@ -1,40 +1,41 @@
 const db = require("../utils/database");
 
 module.exports = class User {
-  constructor(
-    fname,
-    lname,
-    email,
-    password,
-    gender,
-    accountType,
-    accountTypeSub,
-    mobileNum
-  ) {
+  constructor(fname, lname, email, password, gender, file) {
     this.fname = fname;
     this.lname = lname;
     this.email = email;
     this.password = password;
     this.gender = gender;
-    this.account_type = accountType;
-    this.account_type_sub = accountTypeSub;
-    this.mobile_num = mobileNum;
+    this.file = file;
   }
 
   save() {
-    return db.execute(
-      `INSERT INTO SLDB.sl_users (fname, lname, email, password_hash, gender, account_type, account_type_sub, mobile_num) VALUES (?,?,?,?,?,?,?,?)`,
-      [
-        this.fname,
-        this.lname,
-        this.email,
-        this.password,
-        this.gender,
-        this.account_type,
-        this.account_type_sub,
-        this.mobile_num,
-      ]
-    );
+    if (this.file) {
+      return db.execute(
+        `INSERT INTO SLDB.sl_users (fname, lname, email, password_hash, gender, file) VALUES (?,?,?,?,?)`,
+        [
+          this.fname,
+          this.lname,
+          this.email,
+          this.password,
+          this.gender,
+          this.file,
+        ]
+      );
+    } else {
+      return db.execute(
+        `INSERT INTO SLDB.sl_users (fname, lname, email, password_hash, gender) VALUES (?,?,?,?,?)`,
+        [
+          this.fname,
+          this.lname,
+          this.email,
+          this.password,
+          this.gender,
+          // this.file,
+        ]
+      );
+    }
   }
 
   //   static deleteById(id) {}
@@ -55,17 +56,16 @@ module.exports = class User {
   }
 
   static async fetchAllById(id) {
-    let result = await db.execute(
-      `SELECT * FROM SLDB.sl_users WHERE user_id = ?`,
-      [id]
-    );
+    let result = await db.execute(`SELECT * FROM SLDB.sl_users WHERE id = ?`, [
+      id,
+    ]);
     return result[0][0];
   }
 
   static async updateProfile(id, about, state_id, city_id, my_skills) {
     my_skills = JSON.stringify(my_skills);
     let result = await db.execute(
-      `UPDATE SLDB.sl_users SET about = "${about}", state_id = ${state_id}, city_id = ${city_id}, my_skills = '${my_skills}' WHERE id = ${id}`
+      `UPDATE SLDB.sl_users SET about = "${about}", state_id = ${state_id}, city_id = ${city_id}, my_skills = '${my_skills}' WHERE user_id = ${id}`
     );
     return result[0];
   }
