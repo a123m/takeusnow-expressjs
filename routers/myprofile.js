@@ -14,4 +14,17 @@ router.post(
   myprofileController.getMainData
 );
 
+router.post(
+  "/categories",
+  // isAuth, // commented for testing
+  myprofileController.getCatData
+);
+
+router.post(
+  "/subcategories",
+  [body("cat_id").isNumeric()],
+  // isAuth, // commented for testing
+  myprofileController.getSubCatData
+);
+
 module.exports = router;
