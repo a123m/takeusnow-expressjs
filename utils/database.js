@@ -7,6 +7,7 @@ const pool = mysql.createPool({
   password: "snaplancing123",
   database: "SLDB",
   port: "3306",
+  multipleStatements: true,
 });
 
 module.exports = pool.promise();

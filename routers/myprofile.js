@@ -10,7 +10,7 @@ const myprofileController = require("../controllers/myprofile");
 router.post(
   "/main",
   [body("id").isNumeric()],
-  isAuth, // commented for testing
+  // isAuth, // commented for testing
   myprofileController.getMainData
 );
 

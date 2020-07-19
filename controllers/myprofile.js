@@ -17,7 +17,8 @@ exports.getMainData = async (req, res, next) => {
       throw error;
     }
 
-    const id = req.params.id;
+    const id = req.body.id;
+    console.log(id);
 
     const profileData = await Profile.getMyProfileData(id);
     if (profileData) {

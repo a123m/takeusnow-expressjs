@@ -1,6 +1,6 @@
 const db = require("../utils/database");
 
-module.exports = class Project {
+module.exports = class Profile {
   constructor(
     userId,
     heading,
@@ -33,16 +33,26 @@ module.exports = class Project {
     );
   }
 
-  getMyProfileData(id) {
-    return db.execute(
-      `SELECT SLDB.sl_users.user_id, fname, lname, about, state_id, city_id, dob, gender, experience,able_to_travel, SLDB.sl_portfolio.portfolio_id, SLDB.sl_portfolio.portfolio_name, SLDB.sl_portfolio.portfolio_image, equipment_name  FROM SLDB.sl_users LEFT JOIN SLDB.sl_portfolio ON SLDB.sl_users.user_id = SLDB.sl_portfolio.user_id LEFT JOIN SLDB.sl_user_categories ON SLDB.sl_users.user_id = SLDB.sl_user_categories.user_id LEFT JOIN SLDB.sl_my_equipments ON SLDB.sl_users.user_id = SLDB.sl_my_equipments.user_id WHERE SLDB.sl_users.user_id = ${id}`
-    );
+  static async getMyProfileData(id) {
+    let data;
+    const sql = `SELECT SLDB.sl_users.user_id, fname, lname, about, state_id, city_id, dob, gender, experience,able_to_travel, profile_image , languages_known FROM SLDB.sl_users WHERE SLDB.sl_users.user_id = ${id}; \
+                 SELECT * FROM SLDB.sl_categories; 
+                 SELECT portfolio_name, portfolio_image FROM SLDB.sl_portfolio WHERE user_id = ${id};
+                 SELECT * FROM SLDB.sl_my_equipments WHERE user_id = ${id} `;
+    let result = await db.query(sql, [id], (result) => {
+      return result;
+    });
+    data = {
+      user: result[0][0],
+      catData: result[0][1],
+      portfolio: result[0][2],
+      my_equipments: result[0][3],
+    };
+    return data;
   }
-  getCategories() {
-    return db.execute(`SELECT * FROM sl_categories`);
-  }
-  getSubCategories(cat_id) {
-    return db.execute(
+
+  static async getSubCategories(cat_id) {
+    return await db.execute(
       `SELECT * FROM sl_sub_categories WHERE cat_id = ${cat_id}`
     );
   }
