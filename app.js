@@ -11,6 +11,7 @@ const projectRoutes = require("./routers/project");
 const browseRoutes = require("./routers/browse");
 const myprofileRoutes = require("./routers/myprofile");
 const portfolioRoutes = require("./routers/portfolio");
+const swaggerDocument = require("./swaggerDoc");
 
 const app = express();
 
@@ -93,6 +94,7 @@ app.use((error, req, res, next) => {
   });
   next();
 });
+swaggerDocument(app);
 
 try {
   const server = app.listen(process.env.PORT || 8080);
