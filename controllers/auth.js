@@ -23,13 +23,13 @@ exports.signup = async (req, res, next) => {
     const password = req.body.password;
     const hashedPw = await bcrypt.hash(password, 12);
     const gender = req.body.gender;
-    const file = req.file.file;
+    // const file = req.file.file;
 
     /**
      * always create new object with new data to store in DB
      */
     // console.log(hashedPw);
-    const user = new User(fname, lname, email, hashedPw, gender, file);
+    const user = new User(fname, lname, email, hashedPw, gender);
     // console.log(user);
     const result = await user.save();
     res

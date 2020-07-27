@@ -13,14 +13,14 @@ module.exports = class User {
   save() {
     if (this.file) {
       return db.execute(
-        `INSERT INTO SLDB.sl_users (fname, lname, email, password_hash, gender, file) VALUES (?,?,?,?,?)`,
+        `INSERT INTO SLDB.sl_users (fname, lname, email, password_hash, gender ) VALUES (?,?,?,?)`,
         [
           this.fname,
           this.lname,
           this.email,
           this.password,
           this.gender,
-          this.file,
+          // this.file,
         ]
       );
     } else {
