@@ -1,9 +1,9 @@
-const { validationResult } = require("express-validator");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const mailer = require("../middleware/mailer");
+const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mailer = require('../middleware/mailer');
 
-const User = require("../modals/user");
+const User = require('../modals/user');
 
 /**
  * Function handle aa signUp requests
@@ -12,7 +12,7 @@ exports.signup = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("E-Mail address already exists!");
+      const error = new Error('E-Mail address already exists!');
       error.statusCode = 422;
       error.data = errors.array();
       throw error;
@@ -51,11 +51,8 @@ exports.signup = async (req, res, next) => {
     const result = await user.save();
     res
       .status(200)
-      .json({ message: "User created!", user_id: result[0].insertId });
+      .json({ message: 'User created!', user_id: result[0].insertId });
   } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
     next(err);
   }
 };
@@ -67,7 +64,7 @@ exports.login = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Validation failed, entered data is incorrect.");
+      const error = new Error('Validation failed, entered data is incorrect.');
       error.statusCode = 422;
       error.data = errors.array();
       throw error;
@@ -77,15 +74,21 @@ exports.login = async (req, res, next) => {
     const user = await User.findByEmail(email);
 
     if (!user) {
-      const error = new Error("User Not Found");
+      const error = new Error('User Not Found');
       error.statusCode = 401;
       throw error;
     }
-    console.log(password);
+
+    if (!user.status) {
+      const error = new Error('Please verify your E-mail!');
+      error.statusCode = 401;
+      throw error;
+    }
+
     const isEqual = await bcrypt.compare(password, user.password_hash);
 
     if (!isEqual) {
-      const error = new Error("Wrong Password");
+      const error = new Error('Wrong Password');
       error.statusCode = 401;
       throw error;
     }
@@ -94,23 +97,26 @@ exports.login = async (req, res, next) => {
       {
         email: email,
       },
-      "somesupersecretsecret",
-      { expiresIn: "1h" }
+      'somesupersecretsecret',
+      { expiresIn: '1d' }
     );
 
-    res.status(200).json({ message: "Welcome", token: token, value: user });
+    res.status(200).json({
+      message: 'Welcome',
+      token: token,
+      userId: user.user_id,
+      accountType: user.account_type,
+    });
   } catch (err) {
     next(err);
   }
 };
 
-exports.passwordreset = async (req, res, next) => {
+exports.passwordReset = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error(
-        "E-Mail address doesn't exists! Instead Want to signup ?"
-      );
+      const error = new Error('Enter valid e-mail!');
       error.statusCode = 422;
       throw error;
     }
@@ -119,27 +125,29 @@ exports.passwordreset = async (req, res, next) => {
 
     const result = await User.findByEmail(email);
 
-    if (result) {
-      var payload = {
-        id: result.user_id, // User ID from database
-        email: result.email,
-      };
-
-      var token = jwt.sign(payload, "snaplancingresetpassworddecode");
-      let messageSend = mailer.resetPassword(email, token, payload);
-      if (messageSend) {
-        res.status(200).json({
-          message: "Reset password mail Sent Successfully",
-          value: messageSend,
-        });
-      } else {
-        res.status(737).json({ message: "Failed" });
-      }
-    } else {
-      res.status(402).json({
-        message: "This E-mail is not found, Register yourself please",
-      });
+    if (!result) {
+      const error = new Error('E-Mail address does not exists!');
+      error.statusCode = 402;
+      throw error;
     }
+
+    const payload = {
+      id: result.user_id, // User ID from database
+      email: result.email,
+    };
+
+    const token = jwt.sign(payload, 'snaplancingresetpassworddecode');
+    const messageSend = mailer.resetPassword(email, token, payload);
+
+    if (!messageSend) {
+      const error = new Error('Failed to send mail. Please try again!');
+      error.statusCode = 500;
+      throw error;
+    }
+    res.status(200).json({
+      message: 'Reset password mail Sent Successfully',
+      value: messageSend,
+    });
   } catch (err) {
     next(err);
   }
@@ -149,31 +157,28 @@ exports.setResetPassword = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Validation Failed");
+      const error = new Error('Validation Failed');
       error.statusCode = 422;
       throw error;
     }
 
-    let id = req.body.id;
-    let email = req.body.email;
-    let password = req.body.password;
-    let jwtToken = req.body.token;
+    const id = req.body.id;
+    const email = req.body.email;
+    const password = req.body.password;
+    const jwtToken = req.body.token;
 
-    let token = jwt.decode(jwtToken, "snaplancingresetpassworddecode");
+    const token = jwt.decode(jwtToken, 'snaplancingresetpassworddecode');
     const hashedPw = await bcrypt.hash(password, 12);
-    // console.log(hashedPw);
-    // console.log(token.email);
 
-    if (token.id == id && token.email == email) {
-      let result = User.forgetpassword(id, hashedPw);
-      res
-        .status(200)
-        .json({ message: "Password changed Successfully", result: result });
-    } else {
-      res
-        .status(401)
-        .json({ message: "You are Not authorized to change password" });
+    if (token.id !== id && token.email !== email) {
+      const error = new Error('You are not authorized to change password.');
+      error.statusCode = 401;
+      throw error;
     }
+    const result = User.forgetPassword(id, hashedPw);
+    res
+      .status(200)
+      .json({ message: 'Password changed Successfully', result: result });
   } catch (err) {
     next(err);
   }

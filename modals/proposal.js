@@ -24,7 +24,7 @@ module.exports = class Proposal {
    */
   save() {
     return db.execute(
-      `INSERT INTO SLDB.sl_users (user_id, project_id, full_name, proposed_price, created_at= now(), proposal_description,status) VALUES (?,?,?,?)`,
+      `INSERT INTO SLDB.sl_users (user_id, project_id, full_name, proposed_price, created_on=now(), proposal_description,status) VALUES (?,?,?,?)`,
       [
         this.user_id,
         this.project_id,

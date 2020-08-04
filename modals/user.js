@@ -1,4 +1,4 @@
-const db = require("../utils/database");
+const db = require('../utils/database');
 
 module.exports = class User {
   constructor(
@@ -23,7 +23,9 @@ module.exports = class User {
 
   save() {
     return db.execute(
-      `INSERT INTO SLDB.sl_users (fname, lname, email, password_hash, gender, account_type, account_type_sub, mobile_num) VALUES (?,?,?,?,?,?,?,?)`,
+      `INSERT INTO SLDB.sl_users 
+      (fname, lname, email, password_hash, gender, account_type, account_type_sub, mobile_num, created_on, updated_on) 
+      VALUES (?,?,?,?,?,?,?,?,NOW(),NOW())`,
       [
         this.fname,
         this.lname,
@@ -70,7 +72,7 @@ module.exports = class User {
     return result[0];
   }
 
-  static async forgetpassword(id, password) {
+  static async forgetPassword(id, password) {
     // console.log(id);
     let result = await db.execute(
       `UPDATE SLDB.sl_users SET password_hash = '${password}'  WHERE user_id = ${id}`

@@ -1,64 +1,55 @@
-const express = require("express");
-const { body } = require("express-validator");
+const express = require('express');
+const { body } = require('express-validator');
 
-const authController = require("../controllers/auth");
+const authController = require('../controllers/auth');
 // const isAuth = require('../middleware/is-auth');
-const User = require("../modals/user");
+const User = require('../modals/user');
 const router = express.Router();
 
 router.post(
-  "/signup",
+  '/signup',
   [
-    body("fname").trim(),
-    body("lname").trim(),
-    body("email")
+    body('fname').trim(),
+    body('lname').trim(),
+    body('email')
       .trim()
       .isEmail()
       .custom((email) => {
         return User.findByEmail(email).then((userDoc) => {
           if (userDoc) {
-            return Promise.reject("E-Mail address already exists!");
+            return Promise.reject('E-Mail address already exists!');
           }
         });
       })
       .normalizeEmail(),
-    body("password").trim().isLength({ min: 5 }),
+
+    body('password').trim().isLength({ min: 5 }),
+    body('gender').trim().isString(),
+    body('accountType').trim().isString(),
+    body('accountTypeSub').trim().isString(),
+    body('mobileNum').trim().isString(),
   ],
   authController.signup
 );
 
 router.post(
-  "/login",
+  '/login',
   [
-    body("email").trim().isEmail().normalizeEmail(),
-    body("password").trim().isLength({ min: 5 }),
+    body('email').trim().isEmail().normalizeEmail(),
+    body('password').trim().isLength({ min: 5 }),
   ],
   authController.login
 );
 
 router.post(
-  "/forgetpassword",
-  [
-    body("email")
-      .trim()
-      .isEmail()
-      .custom((email) => {
-        return User.findByEmail(email).then((userDoc) => {
-          if (!userDoc) {
-            return Promise.reject(
-              "E-Mail address doesn't exists! Instead Want to signup ?"
-            );
-          }
-        });
-      })
-      .normalizeEmail(),
-  ],
-  authController.passwordreset
+  '/forgetpassword',
+  [body('email').trim().isEmail().normalizeEmail()],
+  authController.passwordReset
 );
 router.post(
-  "/setresetpassword",
+  '/setresetpassword',
   [
-    body("id").isNumeric(),
+    body('id').isNumeric(),
     // body("password").isAlphanumeric(),
     // body("token").isAlphanumeric(),
   ],

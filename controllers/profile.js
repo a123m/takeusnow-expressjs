@@ -5,26 +5,39 @@ const { validationResult } = require('express-validator');
 
 // const Project = require("../modals/project");
 const User = require('../modals/user');
+const Portfolio = require('../modals/portfolio');
 
 exports.getMainData = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
+    const userId = JSON.parse(req.params.userId);
 
-    const id = req.params.id;
+    const profileData = await User.fetchAllById(userId);
+    let portfolioData = await Portfolio.getImagesByUserId(userId);
 
-    const profileData = await User.fetchAllById(id);
-
-    if (profileData) {
-      res.status(200).json(profileData);
-    } else {
+    if (!profileData) {
       const error = new Error('Profile Data Not Found');
       error.statusCode = 404;
+      throw error;
+    }
+    if (!portfolioData) {
+      portfolioData = [];
+    }
+
+    profileData.portfolio = portfolioData;
+
+    res.status(200).json(profileData);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.imageUpload = (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error('Please upload a file');
+      error.statusCode = 422;
+      error.data = errors.array();
       throw error;
     }
   } catch (err) {
