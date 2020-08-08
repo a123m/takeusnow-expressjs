@@ -25,7 +25,7 @@ module.exports = class User {
     return db.execute(
       `INSERT INTO SLDB.sl_users 
       (fname, lname, email, password_hash, gender, account_type, account_type_sub, mobile_num, created_on, updated_on) 
-      VALUES (?,?,?,?,?,?,?,?,NOW(),NOW())`,
+      VALUES (?,?,?,?,?,?,?,?,now(),now())`,
       [
         this.fname,
         this.lname,
@@ -44,10 +44,6 @@ module.exports = class User {
   /**
    * static function execute fast
    */
-  static async fetchAll() {
-    return db.execute(`SELECT * FROM products`);
-  }
-
   static async findByEmail(email) {
     let result = await db.execute(
       `SELECT * FROM SLDB.sl_users WHERE email = ?`,
@@ -64,17 +60,24 @@ module.exports = class User {
     return result[0][0];
   }
 
+  static async updateProfileImage(userId, userImage) {
+    const result = await db.execute(
+      `UPDATE SLDB.sl_users SET user_image = '${userImage}', updated_on = now() WHERE user_id = ${userId}`
+    );
+    return result[0];
+  }
+
   static async updateProfile(id, about, state_id, city_id, my_skills) {
     my_skills = JSON.stringify(my_skills);
-    let result = await db.execute(
-      `UPDATE SLDB.sl_users SET about = "${about}", state_id = ${state_id}, city_id = ${city_id}, my_skills = '${my_skills}' WHERE id = ${id}`
+    const result = await db.execute(
+      `UPDATE SLDB.sl_users SET about = '${about}', state_id = ${state_id}, city_id = ${city_id}, my_skills = '${my_skills}' WHERE id = ${id}`
     );
     return result[0];
   }
 
   static async forgetPassword(id, password) {
     // console.log(id);
-    let result = await db.execute(
+    const result = await db.execute(
       `UPDATE SLDB.sl_users SET password_hash = '${password}'  WHERE user_id = ${id}`
     );
     return result[0];

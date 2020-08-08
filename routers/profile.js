@@ -9,49 +9,62 @@ const router = express.Router();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'images');
+    if (file.fieldname === 'portfolioImage') {
+      cb(null, 'public/images/portfolio');
+    }
+    if (file.fieldname === 'userImage') {
+      cb(null, 'public/images/user');
+    }
   },
   filename: (req, file, cb) => {
     cb(null, new Date().toISOString() + '-' + file.originalname);
   },
 });
 
-const fileFilter = multer({
-  fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype === 'image/jpg' ||
-      file.mimetype === 'image/png' ||
-      file.mimetype === 'image/jpeg'
-    ) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only images are allowed'), false);
-    }
-  },
-});
+function fileFilter(req, file, cb) {
+  if (
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only images are allowed'), false);
+  }
+}
+
 const upload = multer({
   storage: fileStorage,
   fileFilter: fileFilter,
-  dest: 'uploads/',
-  limits: 1024 * 1024 * 2,
+  limits: 1024 * 1024 * 1,
 });
 
 router.get('/:userId', isAuth, profileController.getMainData);
 
-router.post('/image', upload.single('userImage'), (req) => {
-  console.log(req.file);
-});
+router.post(
+  '/portfolio',
+  upload.single('portfolioImage'),
+  isAuth,
+  profileController.portfolioUpload
+);
+
+router.delete(
+  '/portfolio/:portfolioId',
+  isAuth,
+  profileController.portfolioDelete
+);
+
+router.post(
+  '/userimage/:userId',
+  upload.single('userImage'),
+  isAuth,
+  profileController.userImageUpload
+);
 
 router.patch(
-  '/update',
-  [
-    body('id').isNumeric(),
-    body('about').isString(),
-    body('state').isNumeric(),
-    body('city').isNumeric(),
-    body('my_skills').isArray(),
-  ],
+  '/:userId',
   isAuth,
+  [body('about').isString()],
   profileController.updateProfileData
 );
 
