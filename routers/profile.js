@@ -1,35 +1,35 @@
-const express = require("express");
-const multer = require("multer");
-const { body } = require("express-validator");
-const isAuth = require("../middleware/is-auth");
+const express = require('express');
+const multer = require('multer');
+const { body } = require('express-validator');
+const isAuth = require('../middleware/is-auth');
 
-const profileController = require("../controllers/profile");
+const profileController = require('../controllers/profile');
 
 const router = express.Router();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    if (file.fieldname === "portfolioImage") {
-      cb(null, "public/images/portfolio");
+    if (file.fieldname === 'portfolioImage') {
+      cb(null, 'public/images/portfolio');
     }
-    if (file.fieldname === "userImage") {
-      cb(null, "public/images/user");
+    if (file.fieldname === 'userImage') {
+      cb(null, 'public/images/user');
     }
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + "-" + file.originalname);
+    cb(null, new Date().toISOString() + '-' + file.originalname);
   },
 });
 
 function fileFilter(req, file, cb) {
   if (
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpeg"
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpeg'
   ) {
     cb(null, true);
   } else {
-    cb(new Error("Only images are allowed"), false);
+    cb(new Error('Only images are allowed'), false);
   }
 }
 
@@ -39,32 +39,32 @@ const upload = multer({
   limits: 1024 * 1024 * 1,
 });
 
-router.get("/:userId", isAuth, profileController.getMainData);
+router.get('/:userId', isAuth, profileController.getMainData);
 
 router.post(
-  "/portfolio",
-  upload.single("portfolioImage"),
+  '/portfolio',
+  upload.single('portfolioImage'),
   isAuth,
   profileController.portfolioUpload
 );
 
 router.delete(
-  "/portfolio/:portfolioId",
+  '/portfolio/:portfolioId',
   isAuth,
   profileController.portfolioDelete
 );
 
 router.post(
-  "/userimage/:userId",
-  upload.single("userImage"),
+  '/userimage/:userId',
+  upload.single('userImage'),
   isAuth,
   profileController.userImageUpload
 );
 
 router.patch(
-  "/:userId",
+  '/:userId',
   isAuth,
-  [body("about").isString()],
+  [body('about').isString()],
   profileController.updateProfileData
 );
 

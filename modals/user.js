@@ -1,39 +1,42 @@
 const db = require('../utils/database');
 
 module.exports = class User {
-  constructor(fname, lname, email, password, gender) {
+  constructor(
+    fname,
+    lname,
+    email,
+    password,
+    gender,
+    accountType,
+    accountTypeSub,
+    mobileNum
+  ) {
     this.fname = fname;
     this.lname = lname;
     this.email = email;
     this.password = password;
     this.gender = gender;
+    this.account_type = accountType;
+    this.account_type_sub = accountTypeSub;
+    this.mobile_num = mobileNum;
   }
 
   save() {
-    if ((this.account_type, this.account_type_sub, this.mobile_num)) {
-      return db.execute(
-        `INSERT INTO SLDB.sl_users 
+    return db.execute(
+      `INSERT INTO SLDB.sl_users 
       (fname, lname, email, password_hash, gender, account_type, account_type_sub, mobile_num, created_on, updated_on) 
       VALUES (?,?,?,?,?,?,?,?,now(),now())`,
-        [
-          this.fname,
-          this.lname,
-          this.email,
-          this.password,
-          this.gender,
-          this.account_type,
-          this.account_type_sub,
-          this.mobile_num,
-        ]
-      );
-    } else {
-      return db.execute(
-        `INSERT INTO SLDB.sl_users 
-      (fname, lname, email, password_hash, gender, created_on, updated_on) 
-      VALUES (?,?,?,?,?,now(),now())`,
-        [this.fname, this.lname, this.email, this.password, this.gender]
-      );
-    }
+      [
+        this.fname,
+        this.lname,
+        this.email,
+        this.password,
+        this.gender,
+        this.account_type,
+        this.account_type_sub,
+        this.mobile_num,
+      ]
+    );
   }
 
   //   static deleteById(id) {}

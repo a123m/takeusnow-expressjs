@@ -22,15 +22,30 @@ exports.signup = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     const hashedPw = await bcrypt.hash(password, 12);
-    const gender = req.body.gender;
-    // const file = req.file.file;
 
+    let gender = req.body.gender;
+    if (gender.toUpperCase() === 'MALE') {
+      gender = 'm';
+    }
+    if (gender.toUpperCase() === 'FEMALE') {
+      gender = 'f';
+    }
+    const accountType = req.body.accountType;
+    const accountTypeSub = req.body.accountTypeSub;
+    const mobileNum = req.body.mobileNum;
     /**
      * always create new object with new data to store in DB
      */
-    // console.log(hashedPw);
-    const user = new User(fname, lname, email, hashedPw, gender);
-    // console.log(user);
+    const user = new User(
+      fname,
+      lname,
+      email,
+      hashedPw,
+      gender,
+      accountType,
+      accountTypeSub,
+      mobileNum
+    );
     const result = await user.save();
     res
       .status(200)
