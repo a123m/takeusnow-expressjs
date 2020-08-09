@@ -25,17 +25,6 @@ exports.getMainData = async (req, res, next) => {
         average_reviews: user.average_reviews,
         total_reviews: user.total_reviews,
         reviews: reviews,
-        // [
-        //   {
-        //     fname: "mike",
-        //     lname: "lulu",
-        //     user_image:
-        //       "https://images.fineartamerica.com/images/artworkimages/mediumlarge/1/1-forest-in-fog-russian-nature-forest-mist-dmitry-ilyshev.jpg",
-        //     review_text: "well done bro!",
-        //     rating: 4,
-        //     createdAt: new Date().toISOString(),
-        //   },
-        // ],
       });
     } else {
       res.status(200).json(reviews);
