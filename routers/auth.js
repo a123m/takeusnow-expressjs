@@ -1,7 +1,5 @@
 const express = require("express");
 const { body } = require("express-validator");
-const multer = require("multer");
-const path = require("path");
 
 const authController = require("../controllers/auth");
 // const isAuth = require('../middleware/is-auth');
@@ -9,34 +7,6 @@ const User = require("../modals/user");
 const router = express.Router();
 
 router.use(express.static(__dirname + "./assets/"));
-
-var fileStorage = multer.diskStorage({
-  destination: "./assets/images",
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-const fileFilter = multer({
-  fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype === "image/jpg" ||
-      file.mimetype === "image/png" ||
-      file.mimetype === "image/jpeg"
-    ) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-    }
-  },
-});
-var upload = multer({
-  storage: fileStorage,
-  fileFilter: fileFilter,
-}).single("image"); // file is name ="filename" in field
 
 /**
  * @swagger
@@ -111,7 +81,6 @@ var upload = multer({
  */
 router.post(
   "/signup",
-  upload,
   [
     body("fname").trim(),
     body("lname").trim(),
@@ -126,7 +95,12 @@ router.post(
         });
       })
       .normalizeEmail(),
+
     body("password").trim().isLength({ min: 5 }),
+    body("gender").trim().isString(),
+    body("accountType").trim().isString(),
+    body("accountTypeSub").trim().isString(),
+    body("mobileNum").trim().isString(),
   ],
   authController.signup
 );
@@ -254,22 +228,8 @@ router.post(
  */
 router.post(
   "/forgetpassword",
-  [
-    body("email")
-      .trim()
-      .isEmail()
-      .custom((email) => {
-        return User.findByEmail(email).then((userDoc) => {
-          if (!userDoc) {
-            return Promise.reject(
-              "E-Mail address doesn't exists! Instead Want to signup ?"
-            );
-          }
-        });
-      })
-      .normalizeEmail(),
-  ],
-  authController.passwordreset
+  [body("email").trim().isEmail().normalizeEmail()],
+  authController.passwordReset
 );
 
 /**

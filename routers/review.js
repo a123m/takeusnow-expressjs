@@ -1,14 +1,18 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 
-const isAuth = require('../middleware/is-auth');
-const homeController = require('../controllers/home');
+const isAuth = require("../middleware/is-auth");
+const reviewController = require("../controllers/review");
 
 const router = express.Router();
 
+router.get("/:userId", reviewController.getMainData);
+
 router.post(
-    '/review',
-    [body('id').isNumeric(), ],
-    isAuth,
-    homeController.getMainData
-  );
+  "/review",
+  [body("id").isNumeric()],
+  isAuth,
+  reviewController.getMainData
+);
+
+module.exports = router;

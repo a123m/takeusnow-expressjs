@@ -1,15 +1,41 @@
 const db = require("../utils/database");
 
 module.exports = class Portfolio {
-  constructor(portfolio_name, portfolio_image, user_id) {
-    (this.portfolio_name = portfolio_name),
-      (this.portfolio_image = portfolio_image),
-      (this.user_id = user_id);
+  constructor(userId, imageName, imageUrl) {
+    (this.user_id = userId),
+      (this.image_name = imageName),
+      (this.image_url = imageUrl);
   }
+
+  /**
+   * It create portfolio_id automatically on every INSERT
+   */
   save() {
     return db.execute(
-      `INSERT INTO SLDB.sl_portfolio (portfolio_name, portfolio_image, user_id, created_date, updated_date) 
-        VALUES (${this.portfolio_name},"${this.portfolio_image}","${this.user_id}", now(),now())`
+      `INSERT INTO SLDB.sl_portfolio (user_id, image_name, image_url, created_on) VALUES (?,?,?,now())`,
+      [this.user_id, this.image_name, this.image_url]
     );
+  }
+
+  static async getAllById(portfolioId) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_portfolio WHERE portfolio_id = ?`,
+      [portfolioId]
+    );
+    return result[0][0];
+  }
+
+  static deleteById(portfolioId) {
+    return db.execute(`DELETE FROM SLDB.sl_portfolio WHERE portfolio_id = ?`, [
+      portfolioId,
+    ]);
+  }
+
+  static async getImagesByUserId(userId) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_portfolio WHERE user_id = ?`,
+      [userId]
+    );
+    return result[0];
   }
 };

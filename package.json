@@ -25,7 +25,8 @@
     "nodemailer": "^6.4.10",
     "socket.io": "^2.3.0",
     "swagger-jsdoc": "^4.0.0",
-    "swagger-ui-express": "^4.1.4"
+    "swagger-ui-express": "^4.1.4",
+    "uniqid": "^5.2.0"
   },
   "devDependencies": {
     "eslint": "^6.7.2",

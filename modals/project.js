@@ -1,4 +1,4 @@
-const db = require("../utils/database");
+const db = require('../utils/database');
 
 module.exports = class Project {
   constructor(
@@ -28,7 +28,7 @@ module.exports = class Project {
   }
   save() {
     return db.execute(
-      `INSERT INTO SLDB.sl_project (sl_provider_id, project_name, project_description, skills_required, country, state, city, budget, validity, type, category, created_date, updated_date) 
+      `INSERT INTO SLDB.sl_project (sl_provider_id, project_name, project_description, skills_required, country, state, city, budget, validity, type, category, created_on, updated_on) 
       VALUES (${this.users_id},"${this.heading}","${this.details}","${this.requireSkills}","${this.country}", ${this.state}, ${this.city}, ${this.budget}, ${this.validity}, '${this.type}', '${this.category}', now(),now())`
     );
   }
@@ -42,7 +42,7 @@ module.exports = class Project {
     offSet,
     limit
   ) {
-    let sql = "SELECT * FROM SLDB.sl_project WHERE 1=1";
+    let sql = 'SELECT * FROM SLDB.sl_project WHERE 1=1';
     if (category) {
       sql += ` AND category = ${category}`;
     }

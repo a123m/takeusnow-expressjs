@@ -1,4 +1,4 @@
-const db = require('../utils/database');
+const db = require("../utils/database");
 
 module.exports = class Review {
   constructor(userId, fullName, rating, description) {
@@ -15,8 +15,10 @@ module.exports = class Review {
     );
   }
 
-  static async getReviewsByUserId() {
-    let result = await db.execute('SELECT * FROM SLDB.review');
-    return result[0];
+  static async getReviewsByUserId(userId, offSet, limit) {
+    const result = await db.execute(
+      `SELECT fname, lname, user_image, description, rating, created_at FROM SLDB.sl_review LEFT JOIN SLDB.sl_users ON SLDB.sl_review.reviewer_users_id = SLDB.sl_users.user_id WHERE SLDB.sl_review.user_id = ${userId} LIMIT ${offSet},${limit}`
+    );
+    return result[0][0];
   }
 };
