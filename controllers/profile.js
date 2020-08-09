@@ -1,11 +1,7 @@
 const fs = require('fs');
 
 const { validationResult } = require('express-validator');
-// const Profile = require("../modals/profile");
 
-// const io = require("../socket");
-
-// const Project = require("../modals/project");
 const User = require('../modals/user');
 const Portfolio = require('../modals/portfolio');
 
@@ -120,10 +116,9 @@ exports.updateProfileData = async (req, res, next) => {
     const state = req.body.state;
     const city = req.body.city;
     const dateOfBirth = req.body.dateOfBirth;
-    const languagesKnown = req.body.languagesKnown;
-    const myEquipments = req.body.myEquipments;
-    const mySkills = req.body.mySkills;
-    const userImage = req.body.userImage;
+    const languagesKnown = JSON.stringify(req.body.languagesKnown);
+    const myEquipments = JSON.stringify(req.body.myEquipments);
+    const mySkills = JSON.stringify(req.body.mySkills);
     const workExperience = req.body.workExperience;
 
     const update = await User.updateProfile(
@@ -136,7 +131,6 @@ exports.updateProfileData = async (req, res, next) => {
       languagesKnown,
       myEquipments,
       mySkills,
-      userImage,
       workExperience
     );
     if (!update) {
@@ -144,7 +138,7 @@ exports.updateProfileData = async (req, res, next) => {
       error.statusCode = 400;
       throw error;
     }
-    res.status(200).json({ message: 'profile updated' });
+    res.status(200).json({ message: 'Profile Updated!' });
   } catch (err) {
     next(err);
   }

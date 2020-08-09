@@ -9,6 +9,7 @@ const profileRoutes = require('./routers/profile');
 const projectRoutes = require('./routers/project');
 const browseRoutes = require('./routers/browse');
 const paymentRoutes = require('./routers/payment');
+const reviewRoutes = require('./routers/review');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/profile', profileRoutes);
 app.use('/project', projectRoutes);
 app.use('/browse', browseRoutes);
 app.use('/payment', paymentRoutes);
+app.use('/reviews', reviewRoutes);
 
 app.get('/', async (req, res) => {
   res.status(200).send('<h1>Hello world</h1>');

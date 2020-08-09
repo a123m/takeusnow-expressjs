@@ -15,8 +15,10 @@ module.exports = class Review {
     );
   }
 
-  static async getReviewsByUserId() {
-    let result = await db.execute('SELECT * FROM SLDB.review');
-    return result[0];
+  static async getReviewsByUserId(userId, offSet, limit) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_review WHERE user_id = ${userId} LIMIT ${offSet},${limit}`
+    );
+    return result[0][0];
   }
 };

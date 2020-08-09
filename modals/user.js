@@ -67,10 +67,23 @@ module.exports = class User {
     return result[0];
   }
 
-  static async updateProfile(id, about, state_id, city_id, my_skills) {
-    my_skills = JSON.stringify(my_skills);
+  static async updateProfile(
+    userId,
+    ableToTravel,
+    about,
+    state,
+    city,
+    dateOfBirth,
+    languagesKnown,
+    myEquipments,
+    mySkills,
+    workExperience
+  ) {
     const result = await db.execute(
-      `UPDATE SLDB.sl_users SET about = '${about}', state_id = ${state_id}, city_id = ${city_id}, my_skills = '${my_skills}' WHERE id = ${id}`
+      `UPDATE SLDB.sl_users SET about = '${about}', able_to_travel = '${ableToTravel}', 
+      state = '${state}', city = '${city}', dob = '${dateOfBirth}', languages_known = '${languagesKnown}', 
+      my_equipments = '${myEquipments}', my_skills = '${mySkills}', work_experience = '${workExperience}' 
+      WHERE user_id = ${userId}`
     );
     return result[0];
   }

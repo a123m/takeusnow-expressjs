@@ -6,7 +6,7 @@ const reviewController = require('../controllers/review');
 
 const router = express.Router();
 
-router.get('/review/:userId', isAuth, reviewController.getMainData);
+router.get('/:userId', reviewController.getMainData);
 
 router.post(
   '/review',
@@ -14,3 +14,5 @@ router.post(
   isAuth,
   reviewController.getMainData
 );
+
+module.exports = router;
