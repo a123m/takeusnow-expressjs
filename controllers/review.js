@@ -20,22 +20,12 @@ exports.getMainData = async (req, res, next) => {
 
     const reviews = await Review.getReviewsByUserId(userId, offset, limit);
 
-    if (req.query.page && req.query.limit) {
+    if (!req.query.page && !req.query.limit) {
       const user = await User.fetchAllById(userId);
       res.status(200).json({
         average_reviews: user.average_reviews,
         total_reviews: user.total_reviews,
-        reviews: [
-          {
-            fname: 'mike',
-            lname: 'lulu',
-            user_image:
-              'https://images.fineartamerica.com/images/artworkimages/mediumlarge/1/1-forest-in-fog-russian-nature-forest-mist-dmitry-ilyshev.jpg',
-            review_text: 'well done bro!',
-            rating: 4,
-            createdAt: new Date().toISOString(),
-          },
-        ],
+        reviews: reviews,
       });
     } else {
       res.status(200).json(reviews);

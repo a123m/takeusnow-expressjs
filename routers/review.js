@@ -9,8 +9,8 @@ const router = express.Router();
 router.get('/:userId', reviewController.getMainData);
 
 router.post(
-  '/review',
-  [body('id').isNumeric()],
+  '/:userId',
+  [body('discription').isNumeric()],
   isAuth,
   reviewController.getMainData
 );

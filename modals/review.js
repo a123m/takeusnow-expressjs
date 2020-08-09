@@ -19,6 +19,6 @@ module.exports = class Review {
     const result = await db.execute(
       `SELECT * FROM SLDB.sl_review WHERE user_id = ${userId} LIMIT ${offSet},${limit}`
     );
-    return result[0][0];
+    return result[0];
   }
 };
