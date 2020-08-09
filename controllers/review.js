@@ -17,7 +17,6 @@ exports.getMainData = async (req, res, next) => {
     const limit = req.query.limit || 10;
 
     const offset = (page - 1) * limit;
-
     const reviews = await Review.getReviewsByUserId(userId, offset, limit);
 
     if (!req.query.page && !req.query.limit) {

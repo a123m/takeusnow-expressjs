@@ -1,0 +1,18 @@
+{
+  "swaggerDefinition": {
+    "info": {
+      "title": "TakeUsNow Api's",
+      "version": "1.0.0",
+      "description": "Test TakeUsNow all API"
+    },
+    "basepath": "/api/v1",
+    "securityDefinitions": {
+      "tokenauth": {
+        "type": "apiKey",
+        "name": "x-access-token",
+        "in": "header"
+      }
+    }
+  },
+  "apis": ["./routers/auth.js"]
+}
