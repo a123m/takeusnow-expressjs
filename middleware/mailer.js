@@ -8,12 +8,14 @@ module.exports = class Mailer {
 
     // create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
-      host: 'mail.sourcesoftsolutions.com',
-      port: 587,
+      host: 'email-smtp.ap-south-1.amazonaws.com',
+      port: 465,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: 'developers@sourcesoftsolutions.com', // generated ethereal user
-        pass: 'developers!pass@345', // generated ethereal password
+        // user: "developers@sourcesoftsolutions.com", // generated ethereal user
+        user: 'AKIA53PQ7GZK72LPDA77',
+        // pass: "developers!pass@345", // generated ethereal password
+        pass: 'BJZXsRS9f2KKhH8sCXnCFP6Jiqt5gk+Ev0fI86HDEGDA',
       },
     });
 
