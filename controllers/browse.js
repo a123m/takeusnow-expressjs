@@ -1,56 +1,52 @@
-const { validationResult } = require("express-validator");
+const { validationResult } = require('express-validator');
 
-const User = require("../modals/user");
-const Project = require("../modals/project");
-const Proposal = require("../modals/proposal");
+const User = require('../modals/user');
+const Project = require('../modals/project');
+const Proposal = require('../modals/proposal');
 
 exports.getMainData = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is incorrect");
+      const error = new Error('Entered Data is incorrect');
       error.statusCode = 422;
       throw error;
     }
 
-    const page = req.query.page;
-    const limit = req.query.limit;
+    const categoryId = req.params.categoryId;
 
-    const category = req.body.category;
-    const city = req.body.city;
-    const state = req.body.state;
-    const minBudget = req.body.minBudget;
-    const maxBudget = req.body.maxBudget;
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const type = req.query.type || 'work';
 
     const offSet = (page - 1) * limit;
 
-    let projectData;
+    if (type === 'work') {
+      const city = req.body.city;
+      const state = req.body.state;
+      const minBudget = req.body.minBudget;
 
-    /**
-     * function to provide project without state and city filter
-     */
-    projectData = await Project.getFilteredProjects(
-      category,
-      state,
-      city,
-      minBudget,
-      maxBudget,
-      offSet,
-      limit
-    );
-
-    /**
-     * function to provide project with state and city filter
-     */
-
-    // const limitedProjects = projectData.slice(startIndex, endIndex);
-
-    if (projectData) {
+      const projectData = await Project.getFilteredProjects(
+        state,
+        city,
+        minBudget,
+        offSet,
+        limit
+      );
+      if (!projectData) {
+        const error = new Error('Profile Data Not Found');
+        error.statusCode = 404;
+        throw error;
+      }
       res.status(200).json(projectData);
-    } else {
-      const error = new Error("Profile Data Not Found");
-      error.statusCode = 404;
-      throw error;
+    }
+
+    /**
+     * wiil be modified in future
+     */
+    if (type === 'hire') {
+      const users = await User.fetchAUsers(offSet, limit);
+      res.status(200).json(users);
     }
   } catch (err) {
     next(err);
@@ -61,7 +57,7 @@ exports.getProject = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
+      const error = new Error('Entered Data is Incorrect');
       error.statusCode = 422;
       error.data = errors.array();
       throw error;
@@ -81,7 +77,7 @@ exports.getProposal = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
+      const error = new Error('Entered Data is Incorrect');
       error.statusCode = 422;
       error.data = errors.array();
       throw error;
@@ -101,7 +97,7 @@ exports.updateProposal = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
+      const error = new Error('Entered Data is Incorrect');
       error.statusCode = 422;
       error.data = errors.array();
       throw error;
@@ -114,7 +110,7 @@ exports.updateProposal = async (req, res, next) => {
     await Proposal.updateProposalStatus(proposalId, status);
     await Project.updateProjectStatus(projectId, status);
 
-    res.status(200).json({ message: "Project accepted" });
+    res.status(200).json({ message: 'Project accepted' });
   } catch (err) {
     next(err);
   }
@@ -124,7 +120,7 @@ exports.createProposal = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
+      const error = new Error('Entered Data is Incorrect');
       error.statusCode = 422;
       error.data = errors.array();
       throw error;
@@ -138,7 +134,7 @@ exports.createProposal = async (req, res, next) => {
     const status = req.body.status;
 
     const userData = User.fetchAllById(userId);
-    const fullName = userData.fname.concat(" ", userData.lname);
+    const fullName = userData.fname.concat(' ', userData.lname);
     /**
      * always create new object with new data to store in DB
      */
@@ -156,7 +152,7 @@ exports.createProposal = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: "Proposal Created!", proposalId: result[0].insertId });
+      .json({ message: 'Proposal Created!', proposalId: result[0].insertId });
   } catch (err) {
     next(err);
   }

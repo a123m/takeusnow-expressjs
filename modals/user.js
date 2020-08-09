@@ -45,7 +45,7 @@ module.exports = class User {
    * static function execute fast
    */
   static async findByEmail(email) {
-    let result = await db.execute(
+    const result = await db.execute(
       `SELECT * FROM SLDB.sl_users WHERE email = ?`,
       [email]
     );
@@ -53,11 +53,18 @@ module.exports = class User {
   }
 
   static async fetchAllById(id) {
-    let result = await db.execute(
+    const result = await db.execute(
       `SELECT * FROM SLDB.sl_users WHERE user_id = ?`,
       [id]
     );
     return result[0][0];
+  }
+
+  static async fetchAUsers(offSet, limit) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_users LIMIT ${offSet},${limit} `
+    );
+    return result[0];
   }
 
   static async updateProfileImage(userId, userImage) {
