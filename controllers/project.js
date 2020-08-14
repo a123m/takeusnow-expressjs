@@ -63,15 +63,14 @@ exports.getMainData = async (req, res, next) => {
 
     const userId = req.params.userId;
 
-    const projectData = await Project.getProjectsByUserId(userId);
+    const projects = await Project.getProjectsByUserId(userId);
 
-    if (projectData) {
-      res.status(200).json({ project: projectData });
-    } else {
+    if (!projects) {
       const error = new Error('Project Data Not Found');
       error.statusCode = 404;
       throw error;
     }
+    res.status(200).json(projects);
   } catch (err) {
     next(err);
   }

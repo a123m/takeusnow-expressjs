@@ -62,7 +62,7 @@ module.exports = class User {
 
   static async fetchAUsers(offSet, limit) {
     const result = await db.execute(
-      `SELECT * FROM SLDB.sl_users LIMIT ${offSet},${limit} `
+      `SELECT * FROM SLDB.sl_users LIMIT ${offSet},${limit}`
     );
     return result[0];
   }
@@ -95,10 +95,9 @@ module.exports = class User {
     return result[0];
   }
 
-  static async forgetPassword(id, password) {
-    // console.log(id);
+  static async forgetPassword(userId, password) {
     const result = await db.execute(
-      `UPDATE SLDB.sl_users SET password_hash = '${password}'  WHERE user_id = ${id}`
+      `UPDATE SLDB.sl_users SET password_hash = '${password}'  WHERE user_id = ${userId}`
     );
     return result[0];
   }

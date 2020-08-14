@@ -26,23 +26,24 @@ exports.getMainData = async (req, res, next) => {
       const state = req.body.state;
       const minBudget = req.body.minBudget;
 
-      const projectData = await Project.getFilteredProjects(
+      const projects = await Project.getFilteredProjects(
+        categoryId,
         state,
         city,
         minBudget,
         offSet,
         limit
       );
-      if (!projectData) {
-        const error = new Error('Profile Data Not Found');
-        error.statusCode = 404;
+      if (!projects) {
+        const error = new Error('Projects fetch fail!');
+        error.statusCode = 403;
         throw error;
       }
-      res.status(200).json(projectData);
+      res.status(200).json(projects);
     }
 
     /**
-     * wiil be modified in future
+     * will be modified in future
      */
     if (type === 'hire') {
       const users = await User.fetchAUsers(offSet, limit);
@@ -55,19 +56,14 @@ exports.getMainData = async (req, res, next) => {
 
 exports.getProject = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
     const projectId = req.params.projectId;
 
-    const result = Project.getProjectByIdWithProposals(projectId);
+    const project = await Project.getProjectById(projectId);
+    const proposals = await Proposal.getProposalsByProjectId(projectId);
 
-    res.status(200).json(result);
+    project.proposals = proposals;
+
+    res.status(200).json(project);
   } catch (err) {
     next(err);
   }
@@ -75,19 +71,11 @@ exports.getProject = async (req, res, next) => {
 
 exports.getProposal = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
     const proposalId = req.params.proposalId;
 
-    const result = await Proposal.getProposalById(proposalId);
+    const proposal = await Proposal.getProposalById(proposalId);
 
-    res.status(200).json(result);
+    res.status(200).json(proposal);
   } catch (err) {
     next(err);
   }

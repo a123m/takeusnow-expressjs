@@ -7,7 +7,7 @@ const projectController = require('../controllers/project');
 
 const router = express.Router();
 
-router.get('/main/:userId', isAuth, projectController.getMainData);
+router.get('/:userId', isAuth, projectController.getMainData);
 
 router.put(
   '/create',

@@ -6,24 +6,11 @@ const browseController = require('../controllers/browse');
 
 const router = express.Router();
 
-router.post(
-  '/:categoryId',
-  // isAuth,
-  browseController.getMainData
-);
+router.post('/:categoryId', isAuth, browseController.getMainData);
 
-router.post(
-  '/getproject',
-  [body('projectId').isNumeric()],
-  isAuth,
-  browseController.getProject
-);
-router.post(
-  '/getProposal',
-  [body('proposalId').isNumeric()],
-  isAuth,
-  browseController.getProposal
-);
+router.get('/project/:projectId', isAuth, browseController.getProject);
+
+router.get('/proposal/:proposalId', isAuth, browseController.getProposal);
 
 router.post(
   '/updateProposal',

@@ -41,6 +41,13 @@ module.exports = class Proposal {
       `SELECT * FROM SLDB.sl_proposal WHERE proposal_id = ?`,
       [proposalId]
     );
+    return result[0][0];
+  }
+
+  static async getProposalsByProjectId(projectId) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_proposals AS P LEFT JOIN SLDB.sl_users AS U ON U.user_id = P.user_id WHERE P.project_id = ${projectId}`
+    );
     return result[0];
   }
 

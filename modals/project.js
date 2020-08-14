@@ -34,39 +34,46 @@ module.exports = class Project {
   }
 
   static async getFilteredProjects(
-    category,
+    categoryId,
     state,
     city,
     minBudget,
-    maxBudget,
     offSet,
     limit
   ) {
-    let sql = 'SELECT * FROM SLDB.sl_project WHERE 1=1';
-    if (category) {
-      sql += ` AND category = ${category}`;
-    }
+    let sql = `SELECT * FROM SLDB.sl_project_category AS PC 
+    LEFT JOIN SLDB.sl_project AS P ON PC.project_id = P.project_id 
+    WHERE PC.category_id = ${categoryId}`;
     if (minBudget) {
       sql += ` AND budget >= ${minBudget} `;
     }
-    if (maxBudget) {
-      sql += ` AND budget <= ${maxBudget}`;
-    }
     if (state) {
-      sql += ` AND state_id = ${state}`;
+      sql += ` AND state = ${state}`;
     }
     if (city) {
-      sql += ` AND city_id = ${city}`;
+      sql += ` AND city = ${city}`;
     }
-    if (offSet && limit) {
-      sql += ` ORDER BY created_date DESC LIMIT ${offSet},${limit}`;
-    }
-    let result = await db.execute(sql);
+
+    sql += ` ORDER BY created_on DESC LIMIT ${offSet},${limit}`;
+
+    const result = await db.execute(sql);
     return result[0];
   }
 
-  static async getProjectsByUserId() {
-    let result = await db.execute(`SELECT * FROM SLDB.sl_project`);
+  static async getProjectById(projectId) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_project WHERE project_id = ${projectId}`
+    );
+    return result[0][0];
+  }
+
+  static async getProjectsByUserId(userId) {
+    const result = await db.execute(
+      `SELECT *  FROM SLDB.sl_project_users AS pu 
+      LEFT JOIN SLDB.sl_project AS p ON pu.project_id = p.project_id 
+      WHERE pu.user_id = ?`,
+      [userId]
+    );
     return result[0];
   }
 
@@ -74,13 +81,5 @@ module.exports = class Project {
     return db.execute(
       `UPDATE SLDB.sl_project SET proposal_status = '${status}'  WHERE proposal_id = ${projectId}`
     );
-  }
-
-  static async getProjectByIdWithProposals(projectId) {
-    const result = await db.execute(
-      `SELECT * FROM SLDB.sl_project LEFT JOIN SLDB.sl_proposals ON SLDB.sl_project.project_id = SLDB.sl_proposals.sl_project_id WHERE SLDB.sl_proposals.sl_project_id= ?`,
-      [projectId]
-    );
-    return result[0];
   }
 };
