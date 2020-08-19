@@ -1,22 +1,11 @@
 const db = require('../utils/database');
 
 module.exports = class Proposal {
-  constructor(
-    projectId,
-    userId,
-    fullName,
-    proposedPrice,
-    createdAt,
-    description,
-    status
-  ) {
-    (this.project_id = projectId),
-      (this.user_id = userId),
-      (this.full_name = fullName),
-      (this.proposed_price = proposedPrice),
-      (this.created_at = createdAt),
-      (this.description = description),
-      (this.status = status);
+  constructor(userId, projectId, proposalDescription, proposedAmount) {
+    (this.user_id = userId),
+      (this.project_id = projectId),
+      (this.proposal_description = proposalDescription),
+      (this.proposed_amount = proposedAmount);
   }
 
   /**
@@ -24,21 +13,19 @@ module.exports = class Proposal {
    */
   save() {
     return db.execute(
-      `INSERT INTO SLDB.sl_users (user_id, project_id, full_name, proposed_price, created_on=now(), proposal_description,status) VALUES (?,?,?,?)`,
+      `INSERT INTO SLDB.sl_proposals (user_id, project_id, proposal_description, proposed_amount, created_at) VALUES (?,?,?,?,now())`,
       [
         this.user_id,
         this.project_id,
-        this.full_name,
-        this.proposed_price,
-        this.description,
-        this.status,
+        this.proposal_description,
+        this.proposed_amount,
       ]
     );
   }
 
   static async getProposalById(proposalId) {
-    const result = db.execute(
-      `SELECT * FROM SLDB.sl_proposal WHERE proposal_id = ?`,
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_proposals AS P LEFT JOIN SLDB.sl_users AS U ON P.user_id = U.user_id WHERE proposal_id = ?`,
       [proposalId]
     );
     return result[0][0];
@@ -49,6 +36,13 @@ module.exports = class Proposal {
       `SELECT * FROM SLDB.sl_proposals AS P LEFT JOIN SLDB.sl_users AS U ON U.user_id = P.user_id WHERE P.project_id = ${projectId}`
     );
     return result[0];
+  }
+
+  static async checkProposalExist(userId, projectId) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_proposals AS P WHERE P.user_id = ${userId} AND P.project_id = ${projectId}`
+    );
+    return result[0][0];
   }
 
   static async updateProposalStatus(proposalId, status) {

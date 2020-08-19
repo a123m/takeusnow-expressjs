@@ -101,4 +101,11 @@ module.exports = class User {
     );
     return result[0];
   }
+
+  static async decreaseAllowedBids(userId) {
+    const result = await db.execute(
+      `UPDATE SLDB.sl_users SET allowed_bids = allowed_bids - 1 WHERE user_id = ${userId}`
+    );
+    return result;
+  }
 };

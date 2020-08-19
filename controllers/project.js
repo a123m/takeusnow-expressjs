@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
-const User = require('../modals/user');
 const Project = require('../modals/project');
 const Review = require('../modals/review');
+const Proposal = require('../modals/proposal');
 
 exports.createProject = async (req, res, next) => {
   try {
@@ -53,14 +53,6 @@ exports.createProject = async (req, res, next) => {
 
 exports.getMainData = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
     const userId = req.params.userId;
 
     const projects = await Project.getProjectsByUserId(userId);
@@ -98,16 +90,8 @@ exports.getProject = async (req, res, next) => {
 
 exports.updateProject = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
-    const projectId = req.body.projectId;
-    const status = req.body.status;
+    const projectId = req.params.projectId;
+    const status = req.query.status;
 
     await Project.updateProjectById(projectId, status);
 
@@ -127,16 +111,23 @@ exports.createReview = async (req, res, next) => {
       throw error;
     }
 
-    const userId = req.body.userId;
-    const reviewProviderId = req.body.reviewProviderId;
-    const rating = req.body.rating;
+    const type = req.query.type;
+
+    const projectId = req.body.projectId;
+    const reviewerUserId = req.body.reviewerUserId;
     const description = req.body.description;
+    const rating = req.body.rating;
 
-    const result = await User.fetchAllById(reviewProviderId);
+    const project = await Project.getProjectById(projectId);
 
-    const fullName = result.fname.concat(' ', result.lname);
+    if (type === 'work') {
+      Review.save(project.owner_id, reviewerUserId, description, rating);
+    }
 
-    await Review.save(userId, fullName, rating, description);
+    if (type === 'hire') {
+      const proposal = await Proposal.getProposalById(project.ap_id);
+      Review.save(proposal.user_id, reviewerUserId, description, rating);
+    }
 
     res.status(200).json({ message: 'Review Saved' });
   } catch (err) {

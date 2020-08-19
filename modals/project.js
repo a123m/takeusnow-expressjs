@@ -69,9 +69,9 @@ module.exports = class Project {
 
   static async getProjectsByUserId(userId) {
     const result = await db.execute(
-      `SELECT *  FROM SLDB.sl_project_users AS pu 
-      LEFT JOIN SLDB.sl_project AS p ON pu.project_id = p.project_id 
-      WHERE pu.user_id = ?`,
+      `SELECT * FROM SLDB.sl_project_users AS PU 
+      LEFT JOIN SLDB.sl_project AS P ON PU.project_id = P.project_id 
+      WHERE PU.user_id = ?`,
       [userId]
     );
     return result[0];
@@ -79,7 +79,7 @@ module.exports = class Project {
 
   static async updateProjectById(projectId, status) {
     return db.execute(
-      `UPDATE SLDB.sl_project SET proposal_status = '${status}'  WHERE proposal_id = ${projectId}`
+      `UPDATE SLDB.sl_project SET project_status = '${status}' WHERE project_id = ${projectId}`
     );
   }
 };

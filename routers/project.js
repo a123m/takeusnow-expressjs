@@ -28,22 +28,15 @@ router.put(
   projectController.createProject
 );
 
-router.get('/project/:projectId', isAuth, projectController.getProject);
-
-router.patch(
-  '/update',
-  [body('projectId').isNumeric(), body('status').isString()],
-  isAuth,
-  projectController.updateProject
-);
+router.get('/update/:projectId', isAuth, projectController.updateProject);
 
 router.post(
   '/review',
   [
-    body('userId').isNumeric(),
-    body('reviewProviderId').isNumeric(),
-    body('rating').isNumeric(),
+    body('projectId').isNumeric(),
+    body('reviewerUserId').isNumeric(),
     body('description').isString(),
+    body('rating').isNumeric(),
   ],
   isAuth,
   projectController.createReview
