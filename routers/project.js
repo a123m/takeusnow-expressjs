@@ -1,5 +1,5 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body, query } = require('express-validator');
 const isAuth = require('../middleware/is-auth');
 
 // const isAuth = require("../middleware/is-auth");
@@ -9,20 +9,19 @@ const router = express.Router();
 
 router.get('/:userId', isAuth, projectController.getMainData);
 
-router.put(
+router.post(
   '/create',
   [
-    body('userId').isNumeric(),
-    body('title').isString(),
-    body('detail').isString(),
-    body('requireSkills').isArray(),
+    body('categoryId').isNumeric(),
+    body('projectTitle').isString(),
+    body('projectDescription').isString(),
+    body('projectStatus').isString(),
+    body('ownerId').isNumeric(),
+    body('reqSkills').isArray(),
+    // body('reqOn').isArray(),
     body('state').isString(),
-    body('status').isString(),
     body('city').isString(),
-    body('budget').isFloat(),
-    body('validity').isString(),
-    body('category').isString(),
-    body('createdAt').isString(),
+    body('budget').isNumeric(),
   ],
   isAuth,
   projectController.createProject
@@ -33,6 +32,7 @@ router.get('/update/:projectId', isAuth, projectController.updateProject);
 router.post(
   '/review',
   [
+    query('accountType').isString(),
     body('projectId').isNumeric(),
     body('reviewerUserId').isNumeric(),
     body('description').isString(),

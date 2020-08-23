@@ -2,34 +2,35 @@ const db = require('../utils/database');
 
 module.exports = class Project {
   constructor(
-    userId,
-    heading,
-    details,
-    requireSkills,
-    country,
+    projectTitle,
+    projectDescription,
+    projectStatus,
+    reqSkills,
     state,
     city,
-    budget,
-    validity,
-    type,
-    category
+    budget
   ) {
-    (this.users_id = userId),
-      (this.heading = heading),
-      (this.details = details),
-      (this.requireSkills = requireSkills),
-      (this.country = country),
+    (this.project_title = projectTitle),
+      (this.project_description = projectDescription),
+      (this.project_status = projectStatus),
+      (this.req_skills = reqSkills),
       (this.state = state),
       (this.city = city),
-      (this.budget = budget),
-      (this.validity = validity),
-      (this.type = type),
-      (this.category = category);
+      (this.budget = budget);
   }
   save() {
     return db.execute(
-      `INSERT INTO SLDB.sl_project (sl_provider_id, project_name, project_description, skills_required, country, state, city, budget, validity, type, category, created_on, updated_on) 
-      VALUES (${this.users_id},"${this.heading}","${this.details}","${this.requireSkills}","${this.country}", ${this.state}, ${this.city}, ${this.budget}, ${this.validity}, '${this.type}', '${this.category}', now(),now())`
+      `INSERT INTO SLDB.sl_project (project_title, project_description, project_status, req_skills, state, city, budget, created_on, updated_on) 
+      VALUES (?,?,?,?,?,?,?, now(),now())`,
+      [
+        this.project_title,
+        this.project_description,
+        this.project_status,
+        this.req_skills,
+        this.state,
+        this.city,
+        this.budget,
+      ]
     );
   }
 
@@ -43,7 +44,7 @@ module.exports = class Project {
   ) {
     let sql = `SELECT * FROM SLDB.sl_project_category AS PC 
     LEFT JOIN SLDB.sl_project AS P ON PC.project_id = P.project_id 
-    WHERE PC.category_id = ${categoryId}`;
+    WHERE PC.category_id = ${categoryId} AND P.project_status = 'ACTIVE'`;
     if (minBudget) {
       sql += ` AND budget >= ${minBudget} `;
     }

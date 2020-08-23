@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const Project = require('../modals/project');
+const ProjectCategory = require('../modals/projectCategory');
+const ProjectUsers = require('../modals/projectUsers');
 const Review = require('../modals/review');
 const Proposal = require('../modals/proposal');
 
@@ -13,40 +15,43 @@ exports.createProject = async (req, res, next) => {
       throw error;
     }
 
-    const userId = req.body.userId;
-    const title = req.body.title;
-    const detail = req.body.detail;
-    const requireSkills = req.body.requireSkills;
-    const country = req.body.country;
+    const categoryId = req.body.categoryId;
+    const projectTitle = req.body.projectTitle;
+    const projectDescription = req.body.projectDescription;
+    const projectStatus = req.body.projectStatus;
+    const ownerId = req.body.ownerId;
+    const reqSkills = req.body.reqSkills;
+    // const reqOn = req.body.reqOn;
     const state = req.body.state;
-    const status = req.body.status;
     const city = req.body.city;
     const budget = req.body.budget;
-    const validity = req.body.validity;
-    const category = req.body.category;
 
     const project = new Project(
-      userId,
-      title,
-      detail,
-      requireSkills,
-      country,
+      projectTitle,
+      projectDescription,
+      projectStatus,
+      ownerId,
+      reqSkills,
+      // reqOn,
       state,
-      status,
       city,
-      budget,
-      validity,
-      category
+      budget
     );
-    await project.save();
+
+    const result = await project.save();
+
+    const projectCategory = new ProjectCategory(result[0].insertId, categoryId);
+
+    await projectCategory.save();
+
+    const projectUsers = new ProjectUsers(result[0].insertId, ownerId);
+
+    await projectUsers.save();
+
     res.status(200).json({
-      message: 'Project created Successfully!',
-      // project_id: result[0].insertId,
+      message: 'Project created successfully!',
     });
   } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
     next(err);
   }
 };
@@ -111,7 +116,7 @@ exports.createReview = async (req, res, next) => {
       throw error;
     }
 
-    const type = req.query.type;
+    const accountType = req.query.accountType;
 
     const projectId = req.body.projectId;
     const reviewerUserId = req.body.reviewerUserId;
@@ -120,13 +125,25 @@ exports.createReview = async (req, res, next) => {
 
     const project = await Project.getProjectById(projectId);
 
-    if (type === 'work') {
-      Review.save(project.owner_id, reviewerUserId, description, rating);
+    if (accountType === 'work') {
+      const review = new Review(
+        project.owner_id,
+        reviewerUserId,
+        description,
+        rating
+      );
+      review.save();
     }
 
-    if (type === 'hire') {
+    if (accountType === 'hire') {
       const proposal = await Proposal.getProposalById(project.ap_id);
-      Review.save(proposal.user_id, reviewerUserId, description, rating);
+      const review = new Review(
+        proposal.owner_id,
+        reviewerUserId,
+        description,
+        rating
+      );
+      review.save();
     }
 
     res.status(200).json({ message: 'Review Saved' });
