@@ -65,6 +65,13 @@ module.exports = class Project {
     return result[0];
   }
 
+  static async getFilteredProjectsByCatId() {
+    let result = await db.execute(
+      'SELECT * FROM SLDB.sl_project_category INNER JOIN SLDB.sl_project ON SLDB.sl_project_category.project_id = SLDB.sl_project.project_id WHERE SLDB.sl_project_category.category_id = 5 '
+    );
+    return result;
+  }
+
   static async getProjectsByUserId() {
     let result = await db.execute(`SELECT * FROM SLDB.sl_project`);
     return result[0];

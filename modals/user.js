@@ -96,9 +96,15 @@ module.exports = class User {
   }
 
   static async forgetPassword(id, password) {
-    // console.log(id);
     const result = await db.execute(
       `UPDATE SLDB.sl_users SET password_hash = '${password}'  WHERE user_id = ${id}`
+    );
+    return result[0];
+  }
+
+  static async validateEmail(userId) {
+    const result = await db.execute(
+      `UPDATE SLDB.sl_users SET email_verify = '1'  WHERE user_id = ${userId}`
     );
     return result[0];
   }

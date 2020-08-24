@@ -11,6 +11,7 @@ const browseRoutes = require('./routers/browse');
 const paymentRoutes = require('./routers/payment');
 const reviewRoutes = require('./routers/review');
 const swaggerDocument = require('./swaggerDoc');
+const validationRoutes = require('./routers/validation');
 
 const app = express();
 
@@ -36,9 +37,18 @@ app.use('/project', projectRoutes);
 app.use('/browse', browseRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/reviews', reviewRoutes);
+app.use('/validation', validationRoutes);
 
 app.get('/', (req, res) => {
   res.status(200).send('<h1>hello</h1>');
+});
+
+app.get('/forget', (req, res) => {
+  res
+    .status(200, { 'Content-Type': 'application/json' })
+    .send(
+      '<form method= "post" action="/validation/emailval"> <label> Enter new password </label> <input class="form-control" id="email" name="email" placeholder="email" type="text" > <label> Confirm new password </label> <input class="form-control" id="userID" name="userID" placeholder="email" type="text" > <button type="submit" >register</button> </form>'
+    );
 });
 
 app.use((error, req, res, next) => {
