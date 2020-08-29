@@ -1,9 +1,24 @@
 const { validationResult } = require('express-validator');
 const Project = require('../modals/project');
-const ProjectCategory = require('../modals/projectCategory');
-const ProjectUsers = require('../modals/projectUsers');
 const Review = require('../modals/review');
 const Proposal = require('../modals/proposal');
+
+exports.getMainData = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+
+    const projects = await Project.getProjectsByUserId(userId);
+
+    if (!projects) {
+      const error = new Error('Project Data Not Found');
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).json(projects);
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.createProject = async (req, res, next) => {
   try {
@@ -20,19 +35,20 @@ exports.createProject = async (req, res, next) => {
     const projectDescription = req.body.projectDescription;
     const projectStatus = req.body.projectStatus;
     const ownerId = req.body.ownerId;
-    const reqSkills = req.body.reqSkills;
-    // const reqOn = req.body.reqOn;
+    const reqSkills = JSON.stringify(req.body.reqSkills);
+    const reqOn = new Date(req.body.reqOn).toISOString();
     const state = req.body.state;
     const city = req.body.city;
     const budget = req.body.budget;
 
     const project = new Project(
+      categoryId,
       projectTitle,
       projectDescription,
       projectStatus,
       ownerId,
       reqSkills,
-      // reqOn,
+      reqOn,
       state,
       city,
       budget
@@ -40,34 +56,10 @@ exports.createProject = async (req, res, next) => {
 
     const result = await project.save();
 
-    const projectCategory = new ProjectCategory(result[0].insertId, categoryId);
-
-    await projectCategory.save();
-
-    const projectUsers = new ProjectUsers(result[0].insertId, ownerId);
-
-    await projectUsers.save();
-
     res.status(200).json({
+      projectId: result[0].insertId,
       message: 'Project created successfully!',
     });
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.getMainData = async (req, res, next) => {
-  try {
-    const userId = req.params.userId;
-
-    const projects = await Project.getProjectsByUserId(userId);
-
-    if (!projects) {
-      const error = new Error('Project Data Not Found');
-      error.statusCode = 404;
-      throw error;
-    }
-    res.status(200).json(projects);
   } catch (err) {
     next(err);
   }

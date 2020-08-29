@@ -18,7 +18,7 @@ router.post(
     body('projectStatus').isString(),
     body('ownerId').isNumeric(),
     body('reqSkills').isArray(),
-    // body('reqOn').isArray(),
+    body('reqOn').isString(),
     body('state').isString(),
     body('city').isString(),
     body('budget').isNumeric(),

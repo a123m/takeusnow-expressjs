@@ -34,9 +34,11 @@ exports.getMainData = async (req, res, next) => {
         offSet,
         limit
       );
-      if (!projects) {
-        const error = new Error('Projects fetch fail!');
-        error.statusCode = 403;
+      if (projects.length === 0) {
+        const error = new Error(
+          'No active project available of this category!'
+        );
+        error.statusCode = 404;
         throw error;
       }
       res.status(200).json(projects);
