@@ -69,10 +69,10 @@ module.exports = class Project {
       sql += ` AND budget >= ${minBudget} `;
     }
     if (state) {
-      sql += ` AND state = ${state}`;
+      sql += ` AND state = '${state}'`;
     }
     if (city) {
-      sql += ` AND city = ${city}`;
+      sql += ` AND city = '${city}'`;
     }
 
     sql += ` ORDER BY created_on DESC LIMIT ${offSet},${limit}`;
