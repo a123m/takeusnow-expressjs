@@ -25,7 +25,7 @@ module.exports = class Mailer {
       subject: 'Re-set your password', // Subject line
       // text: "Hi this is your reset password link", // plain text body
       html:
-        'This is your password reset link, Click here to reset your password :<a href="http://snaplancing/resetpassword/' +
+        'This is your password reset link, Click here to reset your password :<a href="http://takeusnow-env.eba-t6vpmtr3.ap-south-1.elasticbeanstalk.com/auth/forget' +
         payload.id +
         '/' +
         token +
@@ -35,7 +35,7 @@ module.exports = class Mailer {
     return info;
   }
 
-  static async emailValidation(email, token, payload) {
+  static async emailValidation(email, token /*payload*/) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
     // let testAccount = await nodemailer.createTestAccount();
@@ -52,7 +52,6 @@ module.exports = class Mailer {
         pass: 'BJl5tToARVJ5aFsWYHppAXvS746dIKsLfNjLez4U/51I',
       },
     });
-    console.log(payload);
     const info = await transporter.sendMail({
       from: '<snaplancing@gmail.com>', // sender address
       to: 'snaplancing@gmail.com', // list of receivers
