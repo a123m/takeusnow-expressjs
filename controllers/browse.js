@@ -25,7 +25,6 @@ exports.getMainData = async (req, res, next) => {
       const city = req.body.city;
       const state = req.body.state;
       const minBudget = req.body.minBudget;
-
       const projects = await Project.getFilteredProjects(
         categoryId,
         state,
