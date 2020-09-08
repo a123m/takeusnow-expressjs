@@ -8,77 +8,6 @@ const router = express.Router();
 
 router.use(express.static(__dirname + './assets/'));
 
-/**
- * @swagger
- * definition:
- *  error:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 400
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  success:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 200
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  user:
- *    properties:
- *      fname:
- *        type: string
- *      lname:
- *        type: string
- *      email:
- *        type: string
- *        format: email
- * /auth/signup:
- *  post:
- *    tags:
- *    - Register User and Login
- *    description: Register a new user
- *    produces:
- *    - application/json
- *    parameters:
- *    - in: "body"
- *      name: "body"
- *      description: "All fields need to be added"
- *      required: true
- *      schema:
- *        type: object
- *        required:
- *          - userName
- *        properties:
- *          fname:
- *            type: string
- *          lname:
- *            type: string
- *          email:
- *            type: string
- *            format: email
- *          password:
- *            type: string
- *          gender:
- *            type: string
- *            "enum": [
- *              "m,f,o"
- *             ]
- *          file:
- *            type: file
- *    response:
- *      400:
- *        description: invalid request
- *      200:
- *        description: User created succesfully
- */
 router.post(
   '/signup',
   [
@@ -105,66 +34,6 @@ router.post(
   authController.signup
 );
 
-/**
- * @swagger
- * definition:
- *  error:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 400
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  success:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 200
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  user:
- *    properties:
- *      fname:
- *        type: string
- *      lname:
- *        type: string
- *      email:
- *        type: string
- *        format: email
- * /auth/login:
- *  post:
- *    tags:
- *    - Register User and Login
- *    description: Login a new user
- *    produces:
- *    - application/json
- *    parameters:
- *    - in: "body"
- *      name: "body"
- *      description: "All fields need to be added"
- *      required: true
- *      schema:
- *        type: object
- *        required:
- *          - userName
- *        properties:
- *          email:
- *            type: string
- *            format: email
- *          password:
- *            type: string
- *    response:
- *      400:
- *        description: invalid request
- *      200:
- *        description: User created succesfully
- */
 router.post(
   '/login',
   [
@@ -174,116 +43,12 @@ router.post(
   authController.login
 );
 
-/**
- * @swagger
- * definition:
- *  error:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 400
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  success:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 200
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  user:
- *    properties:
- *      fname:
- *        type: string
- *      lname:
- *        type: string
- *      email:
- *        type: string
- *        format: email
- * /auth/forgetpassword:
- *  post:
- *    tags:
- *    - Forget Password
- *    description: Reset password
- *    produces:
- *    - application/json
- *    parameters:
- *    - in: "body"
- *      name: "body"
- *      description: "All fields need to be added"
- *      required: true
- *      schema:
- *        $ref: "#/forgetpassword"
- *    response:
- *      400:
- *        description: invalid request
- *      200:
- *        description: User created succesfully
- */
 router.post(
   '/forgetpassword',
   [body('email').trim().isEmail().normalizeEmail()],
   authController.passwordReset
 );
 
-/**
- * @swagger
- * definition:
- *  error:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 400
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  success:
- *    properties:
- *      statusCode:
- *        type: integer
- *        format: int32
- *        default: 200
- *      message:
- *        type: string
- *      error:
- *        type:string
- *  user:
- *    properties:
- *      fname:
- *        type: string
- *      lname:
- *        type: string
- *      email:
- *        type: string
- *        format: email
- * /auth/setresetpassword:
- *  post:
- *    tags:
- *    - Forget Password
- *    description: Reset password
- *    produces:
- *    - application/json
- *    parameters:
- *    - in: "body"
- *      name: "body"
- *      description: "All fields need to be added"
- *      required: true
- *      schema:
- *        $ref: "#/setresetpassword"
- *    response:
- *      400:
- *        description: invalid request
- *      200:
- *        description: User created succesfully
- */
 router.post(
   '/setresetpassword',
   [
@@ -293,5 +58,13 @@ router.post(
   ],
   authController.setResetPassword
 );
+
+router.get('/forget', (req, res) => {
+  res
+    .status(200, { 'Content-Type': 'application/json' })
+    .send(
+      '<form method= "post" action="/validation/emailval"> <label> Enter new password </label> <input class="form-control" id="email" name="email" placeholder="email" type="text" > <label> Confirm new password </label> <input class="form-control" id="userID" name="userID" placeholder="email" type="text" > <button type="submit" >register</button> </form>'
+    );
+});
 
 module.exports = router;

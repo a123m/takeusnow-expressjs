@@ -23,7 +23,7 @@ router.post(
     body('city').isString(),
     body('budget').isNumeric(),
   ],
-  isAuth,
+  // isAuth,
   projectController.createProject
 );
 

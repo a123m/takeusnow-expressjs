@@ -26,8 +26,8 @@ module.exports = class Project {
   }
   async save() {
     const result = await db.execute(
-      `INSERT INTO SLDB.sl_project (project_title, project_description, project_status, owner_id,req_skills, req_on, state, city, budget, created_on, updated_on) 
-      VALUES (?,?,?,?,?,?,?,?,?,now(),now())`,
+      `INSERT INTO SLDB.sl_project (project_title, project_description, project_status, owner_id,req_skills, req_on, country, state, city, budget, created_on, updated_on) 
+      VALUES (?,?,?,?,?,?,101,?,?,?,now(),now())`,
       [
         this.project_title,
         this.project_description,
@@ -50,7 +50,6 @@ module.exports = class Project {
       `INSERT INTO SLDB.sl_project_category (project_id, category_id) VALUE (?,?)`,
       [result[0].insertId, this.category_id]
     );
-
     return result;
   }
 
@@ -62,9 +61,8 @@ module.exports = class Project {
     offSet,
     limit
   ) {
-    let sql = `SELECT * FROM SLDB.sl_project_category AS PC 
-    LEFT JOIN SLDB.sl_project AS P ON PC.project_id = P.project_id 
-    WHERE PC.category_id = ${categoryId} AND P.project_status = 'ACTIVE'`;
+    console.log(city);
+    let sql = `SELECT * FROM SLDB.sl_project LEFT JOIN SLDB.sl_project_category ON SLDB.sl_project_category.project_id = SLDB.sl_project.project_id WHERE SLDB.sl_project_category.category_id = ${categoryId} AND SLDB.sl_project.project_status = 'ACTIVE'`;
     if (minBudget) {
       sql += ` AND budget >= ${minBudget} `;
     }
@@ -76,7 +74,7 @@ module.exports = class Project {
     }
 
     sql += ` ORDER BY created_on DESC LIMIT ${offSet},${limit}`;
-
+    console.log(sql);
     const result = await db.execute(sql);
     return result[0];
   }

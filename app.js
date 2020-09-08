@@ -10,7 +10,8 @@ const projectRoutes = require('./routers/project');
 const browseRoutes = require('./routers/browse');
 const paymentRoutes = require('./routers/payment');
 const reviewRoutes = require('./routers/review');
-const swaggerDocument = require('./swaggerDoc');
+const validationRoutes = require('./routers/validation');
+const worldDataRoutes = require('./routers/worldCountry');
 
 const app = express();
 
@@ -36,6 +37,8 @@ app.use('/project', projectRoutes);
 app.use('/browse', browseRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/reviews', reviewRoutes);
+app.use('/validation', validationRoutes);
+app.use('/worlddata', worldDataRoutes);
 
 app.get('/', (req, res) => {
   res.status(200).send('<h1>hello</h1>');
@@ -51,7 +54,6 @@ app.use((error, req, res, next) => {
   });
   next();
 });
-swaggerDocument(app);
 
 try {
   const server = app.listen(process.env.PORT || 8080);
