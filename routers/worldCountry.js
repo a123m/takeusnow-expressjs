@@ -8,12 +8,11 @@ const router = express.Router();
 
 router.get('/country', isAuth, countryController.getCountryData);
 
-router.get('/state', isAuth, countryController.getStateData);
+router.get('/state', countryController.getStateData);
 
 router.post(
   '/city',
   [body('state_id').isNumeric()],
-  isAuth,
   countryController.getCityData
 );
 
