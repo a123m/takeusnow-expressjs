@@ -6,7 +6,7 @@ const browseController = require('../controllers/browse');
 
 const router = express.Router();
 
-router.post('/:categoryId', browseController.getMainData);
+router.post('/:categoryId', isAuth, browseController.getMainData);
 
 router.get('/project/:projectId', isAuth, browseController.getProject);
 

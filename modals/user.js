@@ -112,6 +112,15 @@ module.exports = class User {
     const result = await db.execute(
       `UPDATE SLDB.sl_users SET allowed_bids = allowed_bids - 1 WHERE user_id = ${userId}`
     );
-    return result;
+    return result[0];
+  }
+
+  // * Update firebase token of the user
+  static async updateFcmToken(firebaseToken, userId) {
+    const result = await db.execute(
+      `UPDATE SLDB.sl_users SET fcm_token = ? WHERE user_id = ?`,
+      [firebaseToken, userId]
+    );
+    return result[0];
   }
 };

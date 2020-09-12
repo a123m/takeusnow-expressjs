@@ -1,8 +1,8 @@
 const express = require('express');
 const { body, query } = require('express-validator');
+
 const isAuth = require('../middleware/is-auth');
 
-// const isAuth = require("../middleware/is-auth");
 const projectController = require('../controllers/project');
 
 const router = express.Router();
@@ -23,7 +23,7 @@ router.post(
     body('city').isString(),
     body('budget').isNumeric(),
   ],
-  // isAuth,
+  isAuth,
   projectController.createProject
 );
 

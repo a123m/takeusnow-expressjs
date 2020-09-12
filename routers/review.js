@@ -6,7 +6,7 @@ const reviewController = require('../controllers/review');
 
 const router = express.Router();
 
-router.get('/:userId', reviewController.getMainData);
+router.get('/:userId', isAuth, reviewController.getMainData);
 
 router.post(
   '/:userId',

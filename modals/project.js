@@ -61,7 +61,6 @@ module.exports = class Project {
     offSet,
     limit
   ) {
-    console.log(city);
     let sql = `SELECT * FROM SLDB.sl_project LEFT JOIN SLDB.sl_project_category ON SLDB.sl_project_category.project_id = SLDB.sl_project.project_id WHERE SLDB.sl_project_category.category_id = ${categoryId} AND SLDB.sl_project.project_status = 'ACTIVE'`;
     if (minBudget) {
       sql += ` AND budget >= ${minBudget} `;
@@ -74,7 +73,6 @@ module.exports = class Project {
     }
 
     sql += ` ORDER BY created_on DESC LIMIT ${offSet},${limit}`;
-    console.log(sql);
     const result = await db.execute(sql);
     return result[0];
   }
