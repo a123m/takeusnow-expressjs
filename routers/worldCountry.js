@@ -10,16 +10,10 @@ router.get('/country', isAuth, countryController.getCountryData);
 
 router.get('/state', isAuth, countryController.getStateData);
 
-<<<<<<< HEAD
 router.get(
   '/city/:state_id',
   [param('state_id')],
   isAuth,
-=======
-router.post(
-  '/city',
-  [body('state_id').isNumeric()],
->>>>>>> dev
   countryController.getCityData
 );
 
