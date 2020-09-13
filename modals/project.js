@@ -105,7 +105,7 @@ module.exports = class Project {
       `SELECT * FROM SLDB.sl_categories WHERE status = '1'`
     );
     const subCat = await db.execute(
-      `SELECT (sub_cat_id + 100) as startAt,sub_cat_id,cat_id, sub_name,status FROM SLDB.sl_sub_categories WHERE status = '1';`
+      `SELECT * FROM SLDB.sl_sub_categories WHERE status = '1';`
     );
     const result = { category: cat[0], sub_category: subCat[0] };
     return result;
