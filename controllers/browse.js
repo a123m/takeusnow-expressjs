@@ -1,56 +1,54 @@
-const { validationResult } = require("express-validator");
+const { validationResult } = require('express-validator');
 
-const User = require("../modals/user");
-const Project = require("../modals/project");
-const Proposal = require("../modals/proposal");
+const User = require('../models/user');
+const Project = require('../models/project');
+const Proposal = require('../models/proposal');
 
 exports.getMainData = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is incorrect");
+      const error = new Error('Entered Data is incorrect');
       error.statusCode = 422;
       throw error;
     }
 
-    const page = req.query.page;
-    const limit = req.query.limit;
+    const categoryId = req.params.categoryId;
 
-    const category = req.body.category;
-    const city = req.body.city;
-    const state = req.body.state;
-    const minBudget = req.body.minBudget;
-    const maxBudget = req.body.maxBudget;
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const type = req.query.type || 'work';
 
     const offSet = (page - 1) * limit;
 
-    let projectData;
+    if (type === 'work') {
+      const city = req.body.city;
+      const state = req.body.state;
+      const minBudget = req.body.minBudget;
+      const projects = await Project.getFilteredProjects(
+        categoryId,
+        state,
+        city,
+        minBudget,
+        offSet,
+        limit
+      );
+      if (projects.length === 0) {
+        const error = new Error(
+          'No active project available of this category!'
+        );
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json(projects);
+    }
 
     /**
-     * function to provide project without state and city filter
+     * will be modified in future
      */
-    projectData = await Project.getFilteredProjects(
-      category,
-      state,
-      city,
-      minBudget,
-      maxBudget,
-      offSet,
-      limit
-    );
-
-    /**
-     * function to provide project with state and city filter
-     */
-
-    // const limitedProjects = projectData.slice(startIndex, endIndex);
-
-    if (projectData) {
-      res.status(200).json(projectData);
-    } else {
-      const error = new Error("Profile Data Not Found");
-      error.statusCode = 404;
-      throw error;
+    if (type === 'hire') {
+      const users = await User.fetchAUsers(offSet, limit);
+      res.status(200).json(users);
     }
   } catch (err) {
     next(err);
@@ -59,19 +57,14 @@ exports.getMainData = async (req, res, next) => {
 
 exports.getProject = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
     const projectId = req.params.projectId;
 
-    const result = Project.getProjectByIdWithProposals(projectId);
+    const project = await Project.getProjectById(projectId);
+    const proposals = await Proposal.getProposalsByProjectId(projectId);
 
-    res.status(200).json(result);
+    project.proposals = proposals;
+
+    res.status(200).json(project);
   } catch (err) {
     next(err);
   }
@@ -79,42 +72,11 @@ exports.getProject = async (req, res, next) => {
 
 exports.getProposal = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
     const proposalId = req.params.proposalId;
 
-    const result = await Proposal.getProposalById(proposalId);
+    const proposal = await Proposal.getProposalById(proposalId);
 
-    res.status(200).json(result);
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.updateProposal = async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
-    const proposalId = req.body.proposalId;
-    const projectId = req.body.projectId;
-    const status = req.body.status;
-
-    await Proposal.updateProposalStatus(proposalId, status);
-    await Project.updateProjectStatus(projectId, status);
-
-    res.status(200).json({ message: "Project accepted" });
+    res.status(200).json(proposal);
   } catch (err) {
     next(err);
   }
@@ -124,7 +86,7 @@ exports.createProposal = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("Entered Data is Incorrect");
+      const error = new Error('Entered Data is Incorrect');
       error.statusCode = 422;
       error.data = errors.array();
       throw error;
@@ -132,31 +94,27 @@ exports.createProposal = async (req, res, next) => {
 
     const userId = req.body.userId;
     const projectId = req.body.projectId;
-    const proposedPrice = req.body.proposedPrice;
-    const description = req.body.description;
-    // const createdAt = req.body.createdAt;
-    const status = req.body.status;
+    const proposalDescription = req.body.proposalDescription;
+    const proposedAmount = req.body.proposedAmount;
 
-    const userData = User.fetchAllById(userId);
-    const fullName = userData.fname.concat(" ", userData.lname);
-    /**
-     * always create new object with new data to store in DB
-     */
+    const proposalCheck = await Proposal.checkProposalExist(userId, projectId);
+    if (proposalCheck) {
+      const error = new Error(
+        'Yoh have already send proposal to this project!'
+      );
+      error.statusCode = 400;
+      throw error;
+    }
     const proposal = new Proposal(
-      projectId,
       userId,
-      fullName,
-      proposedPrice,
-      description,
-      // createdAt,
-      status
+      projectId,
+      proposalDescription,
+      proposedAmount
     );
 
-    const result = await proposal.save();
-
-    res
-      .status(200)
-      .json({ message: "Proposal Created!", proposalId: result[0].insertId });
+    await proposal.save();
+    User.decreaseAllowedBids(userId);
+    res.status(200).json({ message: 'Proposal Created!' });
   } catch (err) {
     next(err);
   }

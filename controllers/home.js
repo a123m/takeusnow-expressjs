@@ -1,27 +1,36 @@
 const { validationResult } = require('express-validator');
-// const Profile = require("../modals/profile");
 
 const io = require('../socket');
 
-// const Project = require('../modals/project');
-const User = require('../modals/user');
+// const Project = require('../models/project');
+const User = require('../models/user');
 
 exports.getMainData = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
+      const error = new Error('Entered Data is incorrect');
       error.statusCode = 422;
       throw error;
     }
 
-    const id = req.body.id;
-    // const location = req.body.location;
+    const userId = req.body.userId;
+    const firebaseToken = req.body.firebaseToken;
 
-    const userData = await User.fetchAllById(id);
+    const user = await User.fetchAllById(userId);
+
+    if (!user) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (user.fcm_token !== firebaseToken) {
+      User.updateFcmToken(firebaseToken, userId);
+    }
     // const projects = await Project.getProjects(location);
 
-    res.status(200).json(userData);
+    res.status(200).json(user);
   } catch (err) {
     next(err);
   }

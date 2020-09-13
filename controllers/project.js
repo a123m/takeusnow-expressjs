@@ -1,7 +1,25 @@
 const { validationResult } = require('express-validator');
-const User = require('../modals/user');
-const Project = require('../modals/project');
-const Review = require('../modals/review');
+
+const Project = require('../models/project');
+const Review = require('../models/review');
+const Proposal = require('../models/proposal');
+
+exports.getMainData = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+
+    const projects = await Project.getProjectsByUserId(userId);
+
+    if (!projects) {
+      const error = new Error('Project Data Not Found');
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).json(projects);
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.createProject = async (req, res, next) => {
   try {
@@ -13,65 +31,36 @@ exports.createProject = async (req, res, next) => {
       throw error;
     }
 
-    const userId = req.body.userId;
-    const title = req.body.title;
-    const detail = req.body.detail;
-    const requireSkills = req.body.requireSkills;
-    const country = req.body.country;
+    const categoryId = req.body.categoryId;
+    const projectTitle = req.body.projectTitle;
+    const projectDescription = req.body.projectDescription;
+    const projectStatus = req.body.projectStatus;
+    const ownerId = req.body.ownerId;
+    const reqSkills = JSON.stringify(req.body.reqSkills);
+    const reqOn = new Date(req.body.reqOn).toISOString();
     const state = req.body.state;
-    const status = req.body.status;
     const city = req.body.city;
     const budget = req.body.budget;
-    const validity = req.body.validity;
-    const category = req.body.category;
 
     const project = new Project(
-      userId,
-      title,
-      detail,
-      requireSkills,
-      country,
+      categoryId,
+      projectTitle,
+      projectDescription,
+      projectStatus,
+      ownerId,
+      reqSkills,
+      reqOn,
       state,
-      status,
       city,
-      budget,
-      validity,
-      category
+      budget
     );
-    await project.save();
+
+    const result = await project.save();
+
     res.status(200).json({
-      message: 'Project created Successfully!',
-      // project_id: result[0].insertId,
+      projectId: result[0].insertId,
+      message: 'Project created successfully!',
     });
-  } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
-    next(err);
-  }
-};
-
-exports.getMainData = async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
-    const userId = req.params.userId;
-
-    const projectData = await Project.getProjectsByUserId(userId);
-
-    if (projectData) {
-      res.status(200).json({ project: projectData });
-    } else {
-      const error = new Error('Project Data Not Found');
-      error.statusCode = 404;
-      throw error;
-    }
   } catch (err) {
     next(err);
   }
@@ -99,16 +88,8 @@ exports.getProject = async (req, res, next) => {
 
 exports.updateProject = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Entered Data is Incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
-      throw error;
-    }
-
-    const projectId = req.body.projectId;
-    const status = req.body.status;
+    const projectId = req.params.projectId;
+    const status = req.query.status;
 
     await Project.updateProjectById(projectId, status);
 
@@ -128,16 +109,35 @@ exports.createReview = async (req, res, next) => {
       throw error;
     }
 
-    const userId = req.body.userId;
-    const reviewProviderId = req.body.reviewProviderId;
-    const rating = req.body.rating;
+    const accountType = req.query.accountType;
+
+    const projectId = req.body.projectId;
+    const reviewerUserId = req.body.reviewerUserId;
     const description = req.body.description;
+    const rating = req.body.rating;
 
-    const result = await User.fetchAllById(reviewProviderId);
+    const project = await Project.getProjectById(projectId);
 
-    const fullName = result.fname.concat(' ', result.lname);
+    if (accountType === 'work') {
+      const review = new Review(
+        project.owner_id,
+        reviewerUserId,
+        description,
+        rating
+      );
+      review.save();
+    }
 
-    await Review.save(userId, fullName, rating, description);
+    if (accountType === 'hire') {
+      const proposal = await Proposal.getProposalById(project.ap_id);
+      const review = new Review(
+        proposal.owner_id,
+        reviewerUserId,
+        description,
+        rating
+      );
+      review.save();
+    }
 
     res.status(200).json({ message: 'Review Saved' });
   } catch (err) {

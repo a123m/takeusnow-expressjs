@@ -2,13 +2,17 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const isAuth = require('../middleware/is-auth');
-const homeController = require('../controllers/home');
+const reviewController = require('../controllers/review');
 
 const router = express.Router();
 
+router.get('/:userId', isAuth, reviewController.getMainData);
+
 router.post(
-    '/review',
-    [body('id').isNumeric(), ],
-    isAuth,
-    homeController.getMainData
-  );
+  '/:userId',
+  [body('discription').isNumeric()],
+  isAuth,
+  reviewController.getMainData
+);
+
+module.exports = router;
