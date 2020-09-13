@@ -144,3 +144,24 @@ exports.createReview = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.catAndSubcat = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error('Request in incorrect');
+      error.statusCode = 422;
+      error.data = errors.array();
+      throw error;
+    }
+    const user = await Project.getAllCat();
+    if (!user) {
+      const error = new Error('Category Not Found!!');
+      error.statusCode = 400;
+      throw error;
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
+};
