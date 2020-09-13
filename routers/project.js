@@ -42,4 +42,6 @@ router.post(
   projectController.createReview
 );
 
+router.post('/getcat', isAuth, projectController.catAndSubcat);
+
 module.exports = router;

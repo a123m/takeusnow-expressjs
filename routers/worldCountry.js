@@ -13,7 +13,6 @@ router.get('/state', isAuth, countryController.getStateData);
 router.post(
   '/city',
   [body('state_id').isNumeric()],
-  isAuth,
   countryController.getCityData
 );
 

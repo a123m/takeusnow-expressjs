@@ -99,4 +99,15 @@ module.exports = class Project {
       `UPDATE SLDB.sl_project SET project_status = '${status}' WHERE project_id = ${projectId}`
     );
   }
+
+  static async getAllCat() {
+    const cat = await db.execute(
+      `SELECT * FROM SLDB.sl_categories WHERE status = '1'`
+    );
+    const subCat = await db.execute(
+      `SELECT * FROM SLDB.sl_sub_categories WHERE status = '1';`
+    );
+    const result = { category: cat[0], sub_category: subCat[0] };
+    return result;
+  }
 };
