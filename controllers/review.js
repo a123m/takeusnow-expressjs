@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 
-const User = require('../modals/user');
-const Review = require('../modals/review');
+const User = require('../models/user');
+const Review = require('../models/review');
 
 exports.getMainData = async (req, res, next) => {
   try {

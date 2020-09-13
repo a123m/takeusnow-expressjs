@@ -14,14 +14,14 @@ module.exports = class Portfolio {
 
   static async getState() {
     const result = await db.execute(
-      `SELECT * FROM SLDB.sl_state where country_id = 101`
+      `SELECT * FROM SLDB.sl_state WHERE country_id = 101;`
     );
     return result[0];
   }
 
   static async getCity(id) {
     const result = await db.execute(
-      `SELECT * FROM SLDB.sl_cities where state_id = ${id};`
+      `SELECT * FROM SLDB.sl_cities WHERE state_id = ${id};`
     );
     return result[0];
   }

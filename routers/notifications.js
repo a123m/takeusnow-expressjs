@@ -9,7 +9,7 @@ const notificationController = require('../controllers/notifications');
 
 router.post(
   '/send',
-  isAuth,
+  // isAuth,
   [
     body('userId').isNumeric(),
     body('title').trim().isString(),

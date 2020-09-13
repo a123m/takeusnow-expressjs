@@ -2,8 +2,8 @@ const fs = require('fs');
 
 const { validationResult } = require('express-validator');
 
-const User = require('../modals/user');
-const Portfolio = require('../modals/portfolio');
+const User = require('../models/user');
+const Portfolio = require('../models/portfolio');
 
 exports.getMainData = async (req, res, next) => {
   try {
