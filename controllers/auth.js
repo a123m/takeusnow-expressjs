@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mailer = require('../middleware/mailer');
 
-const User = require('../modals/user');
+const User = require('../models/user');
 
 /**
  * Function handle aa signUp requests

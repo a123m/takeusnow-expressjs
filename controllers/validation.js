@@ -2,7 +2,7 @@ const { validationResult } = require('express-validator');
 const mailer = require('../middleware/mailer');
 const jwt = require('jsonwebtoken');
 
-const User = require('../modals/user');
+const User = require('../models/user');
 
 exports.emailValidation = async (req, res) => {
   try {
