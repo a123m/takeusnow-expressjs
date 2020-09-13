@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const { validationResult } = require('express-validator');
 
-const User = require('../modals/user');
+const User = require('../models/user');
 
 exports.sendToAll = async (req, res, next) => {
   try {
@@ -19,9 +19,7 @@ exports.sendToAll = async (req, res, next) => {
       title: title,
       body: body,
     };
-    const fcm_tokens = [
-      'eylF7KxLN7Y:APA91bGDhgY6vZkh44kUUlPq_KyBOQxjql-J7Rc2uoBMXQMHi5sKO6pnc2TBow3z055yG_geM-bzI4BiyqE3W9CvN8UKr_8NTYQiuUr2L4CHlmkgm6ZKHwx2MJrwmLG026nNu4oJw8f7',
-    ];
+    const fcm_tokens = [];
 
     const notification_body = {
       // to: '/topics/' + topic,
@@ -72,12 +70,29 @@ exports.sendToUser = async (req, res, next) => {
 
     const user = await User.fetchAllById(userId);
 
-    const fcm_tokens = [];
-    fcm_tokens.push(user.fcm_token);
-
     const notification_body = {
+      to: user.fcm_token,
       notification: notification,
-      registration_ids: fcm_tokens,
+      android: {
+        notification: {
+          image: 'https://picsum.photos/200/300',
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            'mutable-content': 1,
+          },
+        },
+        fcm_options: {
+          image: 'https://picsum.photos/200/300',
+        },
+      },
+      webpush: {
+        headers: {
+          image: 'https://picsum.photos/200/300',
+        },
+      },
     };
 
     const response = await fetch('https://fcm.googleapis.com/fcm/send', {

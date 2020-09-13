@@ -1,5 +1,5 @@
 const uniqid = require('uniqid');
-// const User = require('../modals/user');
+// const User = require('../models/user');
 const checksum_lib = require('../utils/checksum/checksum');
 
 exports.getRequest = async (req, res, next) => {
