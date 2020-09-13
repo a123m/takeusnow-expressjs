@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/country', isAuth, countryController.getCountryData);
 
-router.get('/state', countryController.getStateData);
+router.get('/state', isAuth, countryController.getStateData);
 
 router.post(
   '/city',
