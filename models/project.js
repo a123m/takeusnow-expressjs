@@ -61,7 +61,11 @@ module.exports = class Project {
     offSet,
     limit
   ) {
-    let sql = `SELECT sl_project.project_id, project_title, project_description, project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, pc_id, category_id, state_name, code, city_name FROM SLDB.sl_project LEFT JOIN SLDB.sl_project_category ON SLDB.sl_project_category.project_id = SLDB.sl_project.project_id LEFT JOIN SLDB.sl_state ON SLDB.sl_state.state_id = SLDB.sl_project.state LEFT JOIN SLDB.sl_cities ON SLDB.sl_cities.id = SLDB.sl_project.city WHERE SLDB.sl_project_category.category_id = ${categoryId} AND SLDB.sl_project.project_status = 'ACTIVE'`;
+    let sql = `SELECT sl_project.project_id, project_title, project_description, project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, pc_id, category_id, state_name, code, city_name FROM SLDB.sl_project 
+    LEFT JOIN SLDB.sl_project_category ON SLDB.sl_project_category.project_id = SLDB.sl_project.project_id 
+    LEFT JOIN SLDB.sl_state ON SLDB.sl_state.state_id = SLDB.sl_project.state 
+    LEFT JOIN SLDB.sl_cities ON SLDB.sl_cities.id = SLDB.sl_project.city 
+    WHERE SLDB.sl_project_category.category_id = ${categoryId} AND SLDB.sl_project.project_status = 'ACTIVE'`;
     if (minBudget) {
       sql += ` AND budget >= ${minBudget} `;
     }
@@ -79,7 +83,10 @@ module.exports = class Project {
 
   static async getProjectById(projectId) {
     const result = await db.execute(
-      `SELECT project_id, project_title, project_description, project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, sl_state.name as state_name, code, sl_cities.name as city_name FROM SLDB.sl_project LEFT JOIN sl_state ON sl_state.state_id = sl_project.state LEFT JOIN sl_cities ON sl_cities.id = sl_project.city WHERE project_id = ${projectId}`
+      `SELECT project_id, project_title, project_description, project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, sl_state.state_name as state_name, code, sl_cities.city_name as city_name FROM SLDB.sl_project 
+      LEFT JOIN sl_state ON sl_state.state_id = sl_project.state 
+      LEFT JOIN sl_cities ON sl_cities.id = sl_project.city 
+      WHERE project_id = ${projectId}`
     );
     return result[0][0];
   }

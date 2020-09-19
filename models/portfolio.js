@@ -1,10 +1,8 @@
 const db = require('../utils/database');
 
 module.exports = class Portfolio {
-  constructor(userId, imageName, imageUrl) {
-    (this.user_id = userId),
-      (this.image_name = imageName),
-      (this.image_url = imageUrl);
+  constructor(userId, imageUrl) {
+    (this.user_id = userId), (this.image_url = imageUrl);
   }
 
   /**
@@ -12,8 +10,8 @@ module.exports = class Portfolio {
    */
   save() {
     return db.execute(
-      `INSERT INTO SLDB.sl_portfolio (user_id, image_name, image_url, created_on) VALUES (?,?,?,now())`,
-      [this.user_id, this.image_name, this.image_url]
+      `INSERT INTO SLDB.sl_portfolio (user_id, image_url, created_on) VALUES (?,?,now())`,
+      [this.user_id, this.image_url]
     );
   }
 
