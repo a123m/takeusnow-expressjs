@@ -145,22 +145,18 @@ exports.createReview = async (req, res, next) => {
   }
 };
 
-exports.catAndSubcat = async (req, res, next) => {
+exports.catAndSubCat = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error('Request in incorrect');
-      error.statusCode = 422;
-      error.data = errors.array();
+    const categories = await Project.getAllCat();
+    const subCat = await Project.getAllSubCat();
+
+    if (!categories || !subCat) {
+      const error = new Error('Category or Sub-Category Not Found!!');
+      error.statusCode = 404;
       throw error;
     }
-    const user = await Project.getAllCat();
-    if (!user) {
-      const error = new Error('Category Not Found!!');
-      error.statusCode = 400;
-      throw error;
-    }
-    res.status(200).json(user);
+
+    res.status(200).json({ categories: categories, sub_categories: subCat });
   } catch (err) {
     next(err);
   }

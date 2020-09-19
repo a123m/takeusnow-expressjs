@@ -108,13 +108,12 @@ module.exports = class Project {
   }
 
   static async getAllCat() {
-    const cat = await db.execute(
-      `SELECT * FROM SLDB.sl_categories WHERE status = '1'`
-    );
-    const subCat = await db.execute(
-      `SELECT * FROM SLDB.sl_sub_categories WHERE status = '1';`
-    );
-    const result = { category: cat[0], sub_category: subCat[0] };
-    return result;
+    const result = await db.execute(`SELECT * FROM SLDB.sl_categories`);
+    return result[0];
+  }
+
+  static async getAllSubCat() {
+    const result = await db.execute(`SELECT * FROM SLDB.sl_sub_categories`);
+    return result[0];
   }
 };
