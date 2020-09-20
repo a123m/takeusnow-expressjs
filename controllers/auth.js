@@ -76,8 +76,7 @@ exports.login = async (req, res, next) => {
       error.statusCode = 401;
       throw error;
     }
-
-    if (!user.status) {
+    if (user.email_verify == 0) {
       const error = new Error('Please verify your E-mail!');
       error.statusCode = 401;
       throw error;
