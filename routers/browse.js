@@ -1,14 +1,21 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 const isAuth = require('../middleware/is-auth');
 
 const browseController = require('../controllers/browse');
 
 const router = express.Router();
 
-router.post('/:categoryId', browseController.getMainData);
+router.post('/:categoryId', isAuth, browseController.getMainData);
 
 router.get('/project/:projectId', isAuth, browseController.getProject);
+
+router.get(
+  '/project/proposal/:userId',
+  [param('userId')],
+  isAuth,
+  browseController.getBids
+);
 
 router.get('/proposal/:proposalId', isAuth, browseController.getProposal);
 

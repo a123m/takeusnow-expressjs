@@ -9,6 +9,10 @@ const router = express.Router();
 
 router.get('/:userId', isAuth, projectController.getMainData);
 
+router.get('/categories/all', isAuth, projectController.catAndSubCat);
+
+router.get('/update/:projectId', isAuth, projectController.updateProject);
+
 router.post(
   '/create',
   [
@@ -27,8 +31,6 @@ router.post(
   projectController.createProject
 );
 
-router.get('/update/:projectId', isAuth, projectController.updateProject);
-
 router.post(
   '/review',
   [
@@ -41,7 +43,5 @@ router.post(
   isAuth,
   projectController.createReview
 );
-
-router.post('/getcat', isAuth, projectController.catAndSubcat);
 
 module.exports = router;

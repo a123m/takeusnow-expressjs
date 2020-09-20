@@ -131,4 +131,13 @@ module.exports = class User {
     );
     return result[0];
   }
+
+  // * Get bids of the user
+  static async getBids(userId) {
+    const result = await db.execute(
+      `SELECT allowed_bids, plan_in_use FROM SLDB.sl_users WHERE user_id = ?`,
+      [userId]
+    );
+    return result[0][0];
+  }
 };

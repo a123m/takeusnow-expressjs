@@ -1,22 +1,21 @@
 const AWS = require('aws-sdk');
-require('dotenv').config();
 
 const s3Client = new AWS.S3({
   credentials: {
-    accessKeyId: process.env.ACCESS_KEY,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+    accessKeyId: 'AKIA53PQ7GZK2E446TEG',
+    secretAccessKey: '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',
   },
-  region: process.env.REGION,
+  region: 'ap-south-1',
 });
 
 const uploadParams = {
-  Bucket: process.env.BUCKET,
+  Bucket: 'takeusnow-public',
   Key: '', // pass key
   Body: null, // pass file body
 };
 
 const deleteParams = {
-  Bucket: process.env.BUCKET,
+  Bucket: 'takeusnow-public',
   Key: '', // pass key
 };
 

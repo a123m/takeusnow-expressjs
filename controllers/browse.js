@@ -119,3 +119,28 @@ exports.createProposal = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getBids = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error('Entered Data is Incorrect');
+      error.statusCode = 422;
+      error.data = errors.array();
+      throw error;
+    }
+
+    const userId = req.params.userId;
+
+    const allowedBids = await User.getBids(userId);
+
+    if (!allowedBids) {
+      const error = new Error('No Bids found');
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).json(allowedBids);
+  } catch (err) {
+    next(err);
+  }
+};
