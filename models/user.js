@@ -135,7 +135,7 @@ module.exports = class User {
   // * Get bids of the user
   static async getBids(userId) {
     const result = await db.execute(
-      `SELECT allowed_bids, plan_in_use FROM SLDB.sl_users WHERE user_id = ?`,
+      `SELECT plan_name AS plan_in_use, allowed_bids FROM SLDB.sl_users LEFT JOIN SLDB.sl_plan ON sl_plan.plan_id = sl_users.plan_in_use WHERE user_id = ?`,
       [userId]
     );
     return result[0][0];
