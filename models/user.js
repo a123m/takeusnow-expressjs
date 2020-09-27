@@ -140,4 +140,29 @@ module.exports = class User {
     );
     return result[0][0];
   }
+
+  static async getFilteredUsers(categoryId, offset, limit) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_users AS U 
+      LEFT JOIN SLDB.sl_user_categories AS UC ON UC.user_id = U.user_id 
+      WHERE UC.cat_id = ? 
+      ORDER BY average_reviews DESC LIMIT ?,?`,
+      [categoryId, offset, limit]
+    );
+    return result[0];
+  }
+
+  static async updateCategory(myCategories, userId) {
+    await db.execute(`DELETE FROM SLDB.sl_user_categories WHERE user_id = ?`, [
+      userId,
+    ]);
+    myCategories.forEach((item) => {
+      db.execute(
+        `INSERT INTO SLDB.sl_user_categories 
+          (user_id, cat_id) 
+          VALUES (?,?)`,
+        [userId, item]
+      );
+    });
+  }
 };
