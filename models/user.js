@@ -57,11 +57,12 @@ module.exports = class User {
       `SELECT able_to_travel, about, account_type, account_type_sub, active_projects, 
       allowed_bids, average_reviews, city, city_name, deleted, dob, email, email_verify, 
       fcm_token, fname, gender, languages_known, lname, mobile_num, my_equipments, my_skills, 
-      plan_in_use, state, state_name, total_reviews, updated_on, user_id, user_image, verification_token, 
-      work_experience FROM SLDB.sl_users 
+       state, state_name, total_reviews, updated_on, user_id, user_image, verification_token, 
+      work_experience, plan_name AS plan_in_use FROM SLDB.sl_users 
       LEFT JOIN SLDB.sl_state ON SLDB.sl_state.state_id = SLDB.sl_users.state 
       LEFT JOIN SLDB.sl_cities ON SLDB.sl_cities.id = SLDB.sl_users.city 
-      WHERE user_id = ?`,
+      LEFT JOIN SLDB.sl_plan ON SLDB.sl_plan.plan_id = SLDB.sl_users.plan_in_use
+      WHERE user_id =?`,
       [id]
     );
     return result[0][0];
@@ -134,7 +135,7 @@ module.exports = class User {
   // * Get bids of the user
   static async getBids(userId) {
     const result = await db.execute(
-      `SELECT allowed_bids, plan_in_use FROM SLDB.sl_users WHERE user_id = ?`,
+      `SELECT plan_name AS plan_in_use, allowed_bids FROM SLDB.sl_users LEFT JOIN SLDB.sl_plan ON sl_plan.plan_id = sl_users.plan_in_use WHERE user_id = ?`,
       [userId]
     );
     return result[0][0];
