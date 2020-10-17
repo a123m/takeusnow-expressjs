@@ -67,4 +67,14 @@ router.get('/forget', (req, res) => {
     );
 });
 
+router.post(
+  '/refreshtoken',
+  [
+    body('token').isAlphanumeric(),
+    // body("password").isAlphanumeric(),
+    // body("token").isAlphanumeric(),
+  ],
+  authController.refreshToken
+);
+
 module.exports = router;
