@@ -2,20 +2,20 @@ const AWS = require('aws-sdk');
 
 const s3Client = new AWS.S3({
   credentials: {
-    accessKeyId: 'AKIA53PQ7GZK2E446TEG',
-    secretAccessKey: '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',
+    accessKeyId: 'AKIA5QB2P7ULSRMO4FCI',
+    secretAccessKey: '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',
   },
   region: 'ap-south-1',
 });
 
 const uploadParams = {
-  Bucket: 'takeusnow-public',
+  Bucket: 'takeusnow-storage',
   Key: '', // pass key
   Body: null, // pass file body
 };
 
 const deleteParams = {
-  Bucket: 'takeusnow-public',
+  Bucket: 'takeusnow-storage',
   Key: '', // pass key
 };
 
