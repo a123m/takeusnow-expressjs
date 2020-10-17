@@ -43,11 +43,13 @@ exports.getMainData = async (req, res, next) => {
       res.status(200).json(projects);
     }
 
-    /**
-     * will be modified in future
-     */
     if (type === 'hire') {
-      const users = await User.fetchAUsers(offSet, limit);
+      const users = await User.getFilteredUsers(categoryId, offSet, limit);
+      if (users.length === 0) {
+        const error = new Error('No active users available of this category!');
+        error.statusCode = 404;
+        throw error;
+      }
       res.status(200).json(users);
     }
   } catch (err) {

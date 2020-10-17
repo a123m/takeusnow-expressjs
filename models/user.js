@@ -57,12 +57,12 @@ module.exports = class User {
       `SELECT able_to_travel, about, account_type, account_type_sub, active_projects, 
       allowed_bids, average_reviews, city, city_name, deleted, dob, email, email_verify, 
       fcm_token, fname, gender, languages_known, lname, mobile_num, my_equipments, my_skills, 
-       state, state_name, total_reviews, updated_on, user_id, user_image, verification_token, 
-      work_experience, plan_name AS plan_in_use FROM SLDB.sl_users 
+       state, state_name, total_reviews, user_id, user_image, verification_token, 
+      work_experience, plan_name FROM SLDB.sl_users 
       LEFT JOIN SLDB.sl_state ON SLDB.sl_state.state_id = SLDB.sl_users.state 
       LEFT JOIN SLDB.sl_cities ON SLDB.sl_cities.id = SLDB.sl_users.city 
       LEFT JOIN SLDB.sl_plan ON SLDB.sl_plan.plan_id = SLDB.sl_users.plan_in_use
-      WHERE user_id =?`,
+      WHERE user_id = ?`,
       [id]
     );
     return result[0][0];
@@ -139,5 +139,30 @@ module.exports = class User {
       [userId]
     );
     return result[0][0];
+  }
+
+  static async getFilteredUsers(categoryId, offset, limit) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_users AS U 
+      LEFT JOIN SLDB.sl_user_categories AS UC ON UC.user_id = U.user_id 
+      WHERE UC.cat_id = ? 
+      ORDER BY average_reviews DESC LIMIT ?,?`,
+      [categoryId, offset, limit]
+    );
+    return result[0];
+  }
+
+  static async updateCategory(myCategories, userId) {
+    await db.execute(`DELETE FROM SLDB.sl_user_categories WHERE user_id = ?`, [
+      userId,
+    ]);
+    myCategories.forEach((item) => {
+      db.execute(
+        `INSERT INTO SLDB.sl_user_categories 
+          (user_id, cat_id) 
+          VALUES (?,?)`,
+        [userId, item]
+      );
+    });
   }
 };

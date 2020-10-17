@@ -181,6 +181,11 @@ exports.updateProfileData = async (req, res, next) => {
     const myEquipments = JSON.stringify(req.body.myEquipments);
     const mySkills = JSON.stringify(req.body.mySkills);
     const workExperience = req.body.workExperience;
+    const myCategories = req.body.myCategories;
+
+    if (myCategories) {
+      User.updateCategory(myCategories, userId);
+    }
 
     const update = await User.updateProfile(
       userId,

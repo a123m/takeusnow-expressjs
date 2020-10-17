@@ -31,7 +31,7 @@ module.exports = class Portfolio {
 
   static async getImagesByUserId(userId) {
     const result = await db.execute(
-      `SELECT * FROM SLDB.sl_portfolio WHERE user_id = ?`,
+      `SELECT * FROM SLDB.sl_portfolio WHERE user_id = ? ORDER BY created_on DESC`,
       [userId]
     );
     return result[0];

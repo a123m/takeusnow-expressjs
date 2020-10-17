@@ -21,7 +21,12 @@ module.exports = class Plan {
             status = { status: 'expired' };
         }
         const result = await db.execute(
-            `SELECT user_id, fname, lname, email, state, city, plan_in_use, allowed_bids, mobile_num, account_type, account_type_sub,plan_name, plan_cost, number_of_bids, expiry_in_days, plan_purchase_id, plan_purchase_date,plan_expiry_date FROM SLDB.sl_users LEFT JOIN SLDB.sl_plan ON sl_plan.plan_id = sl_users.plan_in_use LEFT JOIN SLDB.sl_user_plan ON sl_user_plan.plan_purchase_id = sl_users.plan_in_use WHERE sl_users.user_id = ${user_id} ORDER BY plan_purchase_date DESC LIMIT 1`
+          `SELECT user_id, fname, lname, email, state, city, plan_in_use, allowed_bids, mobile_num, account_type, account_type_sub,plan_name, plan_cost, number_of_bids, expiry_in_days, plan_purchase_id, plan_purchase_date,plan_expiry_date 
+            FROM SLDB.sl_users 
+            LEFT JOIN SLDB.sl_plan ON sl_plan.plan_id = sl_users.plan_in_use 
+            LEFT JOIN SLDB.sl_user_plan ON sl_user_plan.plan_purchase_id = sl_users.plan_in_use 
+            WHERE sl_users.user_id = ${user_id} 
+            ORDER BY plan_purchase_date DESC LIMIT 1`
         );
         const details = {
             plan: result[0],

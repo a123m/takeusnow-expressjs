@@ -13,8 +13,8 @@ router.get('/:userId', isAuth, profileController.getMainData);
 router.post(
   '/portfolio/:userId',
   [param('userId')],
-  upload.single('portfolioImage'),
   isAuth,
+  upload.single('portfolioImage'),
   profileController.portfolioUpload
 );
 
@@ -26,8 +26,8 @@ router.delete(
 
 router.post(
   '/userimage/:userId',
-  upload.single('userImage'),
   isAuth,
+  upload.single('userImage'),
   profileController.userImageUpload
 );
 
