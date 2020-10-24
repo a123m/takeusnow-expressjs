@@ -116,4 +116,20 @@ module.exports = class Project {
     const result = await db.execute(`SELECT * FROM SLDB.sl_sub_categories`);
     return result[0];
   }
+
+  static async acceptProposal(projectId, proposalId) {
+    await db.execute(
+      `UPDATE SLDB.sl_proposals SET proposal_status = 1 WHERE proposal_id = ?`,
+      [proposalId]
+    );
+    await db.execute(
+      `UPDATE SLDB.sl_project SET ap_id = ? WHERE project_id = ?`,
+      [proposalId, projectId]
+    );
+    const result = await db.execute(
+      `SELECT owner_id FROM SLDB.sl_project WHERE project_id = ?`,
+      [projectId]
+    );
+    return result[0][0];
+  }
 };

@@ -165,4 +165,12 @@ module.exports = class User {
       );
     });
   }
+
+  static async getFCMToken(userId) {
+    const result = await db.execute(
+      `SELECT fcm_token from SLDB.sl_users WHERE user_id = ?`,
+      [userId]
+    );
+    return result[0][0];
+  }
 };

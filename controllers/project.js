@@ -1,8 +1,10 @@
 const { validationResult } = require('express-validator');
+const { sendNotification } = require('../utils/notification');
 
 const Project = require('../models/project');
 const Review = require('../models/review');
 const Proposal = require('../models/proposal');
+const User = require('../models/user');
 
 exports.getMainData = async (req, res, next) => {
   try {
@@ -157,6 +159,22 @@ exports.catAndSubCat = async (req, res, next) => {
     }
 
     res.status(200).json({ categories: categories, sub_categories: subCat });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.acceptProposal = async (req, res, next) => {
+  try {
+    const projectId = req.params.projectId;
+    const proposalId = req.params.proposalId;
+    const project = await Project.acceptProposal(projectId, proposalId);
+    const user = await User.getFCMToken(project.owner_id);
+    sendNotification(
+      'Congratulation',
+      `Your Proposal is accepted.`,
+      user.fcm_token
+    );
   } catch (err) {
     next(err);
   }

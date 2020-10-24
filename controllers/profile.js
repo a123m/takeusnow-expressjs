@@ -135,7 +135,7 @@ exports.userImageUpload = async (req, res, next) => {
     uploadParams.Body = streamifier.createReadStream(req.file.buffer);
 
     const user = await User.fetchAllById(userId);
-    if (user.user_image.length > 0) {
+    if (user.user_image && user.user_image.length > 0) {
       const startIndex = user.user_image.indexOf('user/');
       const userImageKey = user.user_image.slice(
         startIndex,

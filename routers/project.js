@@ -13,6 +13,12 @@ router.get('/categories/all', isAuth, projectController.catAndSubCat);
 
 router.get('/update/:projectId', isAuth, projectController.updateProject);
 
+router.get(
+  '/:projectId/proposal/:proposalId',
+  isAuth,
+  projectController.acceptProposal
+);
+
 router.post(
   '/create',
   [
