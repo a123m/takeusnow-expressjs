@@ -10,11 +10,6 @@ router.get('/country', isAuth, countryController.getCountryData);
 
 router.get('/state', isAuth, countryController.getStateData);
 
-router.get(
-  '/city/:state_id',
-  [param('state_id')],
-  isAuth,
-  countryController.getCityData
-);
+router.get('/city/:state_id', [param('state_id')], isAuth, countryController.getCityData);
 
 module.exports = router;

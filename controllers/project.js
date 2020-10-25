@@ -168,7 +168,12 @@ exports.acceptProposal = async (req, res, next) => {
   try {
     const projectId = req.params.projectId;
     const proposalId = req.params.proposalId;
-    const project = await Project.acceptProposal(projectId, proposalId);
+    const proposal = await Proposal.getProposalById(proposalId);
+    const project = await Project.acceptProposal(
+      projectId,
+      proposalId,
+      proposal.user_id
+    );
     const user = await User.getFCMToken(project.owner_id);
     sendNotification(
       'Congratulation',

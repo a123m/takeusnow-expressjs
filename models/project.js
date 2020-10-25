@@ -65,7 +65,7 @@ module.exports = class Project {
     LEFT JOIN SLDB.sl_project_category ON SLDB.sl_project_category.project_id = SLDB.sl_project.project_id 
     LEFT JOIN SLDB.sl_state ON SLDB.sl_state.state_id = SLDB.sl_project.state 
     LEFT JOIN SLDB.sl_cities ON SLDB.sl_cities.id = SLDB.sl_project.city 
-    WHERE SLDB.sl_project_category.category_id = ${categoryId} AND SLDB.sl_project.project_status = 'ACTIVE'`;
+    WHERE SLDB.sl_project_category.category_id = ${categoryId} AND SLDB.sl_project.project_status = '1'`;
     if (minBudget) {
       sql += ` AND budget >= ${minBudget} `;
     }
@@ -83,9 +83,10 @@ module.exports = class Project {
 
   static async getProjectById(projectId) {
     const result = await db.execute(
-      `SELECT project_id, project_title, project_description, project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, sl_state.state_name as state_name, code, sl_cities.city_name as city_name FROM SLDB.sl_project 
-      LEFT JOIN sl_state ON sl_state.state_id = sl_project.state 
-      LEFT JOIN sl_cities ON sl_cities.id = sl_project.city 
+      `SELECT project_id, project_title, project_description, sl_status.project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, sl_state.state_name as state_name, code, sl_cities.city_name as city_name FROM SLDB.sl_project 
+      LEFT JOIN SLDB.sl_state ON sl_state.state_id = sl_project.state 
+      LEFT JOIN SLDB.sl_cities ON sl_cities.id = sl_project.city 
+      LEFT JOIN SLDB.sl_status ON sl_status.status_id = sl_project.project_status
       WHERE project_id = ${projectId}`
     );
     return result[0][0];
@@ -93,8 +94,8 @@ module.exports = class Project {
 
   static async getProjectsByUserId(userId) {
     const result = await db.execute(
-      `SELECT * FROM SLDB.sl_project_users AS PU 
-      LEFT JOIN SLDB.sl_project AS P ON PU.project_id = P.project_id 
+      `SELECT pu_id, P.project_id, user_id, PU.project_id, project_title, project_description, country, req_skills, s.project_status, state, city, budget, owner_id, created_on, updated_on, req_on, ap_id, status_id, description FROM SLDB.sl_project_users AS PU 
+      LEFT JOIN SLDB.sl_project AS P ON PU.project_id = P.project_id LEFT JOIN SLDB.sl_status AS s ON s.status_id = P.project_status
       WHERE PU.user_id = ?`,
       [userId]
     );
@@ -117,14 +118,18 @@ module.exports = class Project {
     return result[0];
   }
 
-  static async acceptProposal(projectId, proposalId) {
+  static async acceptProposal(projectId, proposalId, proposalUserId) {
     await db.execute(
       `UPDATE SLDB.sl_proposals SET proposal_status = 1 WHERE proposal_id = ?`,
       [proposalId]
     );
     await db.execute(
-      `UPDATE SLDB.sl_project SET ap_id = ? WHERE project_id = ?`,
+      `UPDATE SLDB.sl_project SET ap_id = ?, project_status = '2' WHERE project_id = ?`,
       [proposalId, projectId]
+    );
+    await db.execute(
+      `INSERT INTO SLDB.sl_project_users (project_id, user_id) VALUE (?,?)`,
+      [projectId, proposalUserId]
     );
     const result = await db.execute(
       `SELECT owner_id FROM SLDB.sl_project WHERE project_id = ?`,
