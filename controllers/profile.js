@@ -135,7 +135,7 @@ exports.userImageUpload = async (req, res, next) => {
     uploadParams.Body = streamifier.createReadStream(req.file.buffer);
 
     const user = await User.fetchAllById(userId);
-    if (user.user_image.length > 0) {
+    if (user.user_image && user.user_image.length > 0) {
       const startIndex = user.user_image.indexOf('user/');
       const userImageKey = user.user_image.slice(
         startIndex,
@@ -184,10 +184,10 @@ exports.updateProfileData = async (req, res, next) => {
     const myCategories = req.body.myCategories;
 
     if (myCategories) {
-      User.updateCategory(myCategories, userId);
+      await User.updateCategory(myCategories, userId);
     }
 
-    const update = await User.updateProfile(
+    const user = await User.updateProfile(
       userId,
       ableToTravel,
       about,
@@ -199,12 +199,12 @@ exports.updateProfileData = async (req, res, next) => {
       mySkills,
       workExperience
     );
-    if (!update) {
+    if (!user) {
       const error = new Error('Profile update failed. Please try again later!');
       error.statusCode = 400;
       throw error;
     }
-    res.status(200).json({ message: 'Profile Updated!' });
+    res.status(200).json(user);
   } catch (err) {
     next(err);
   }

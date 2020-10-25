@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator');
+const { sendNotification } = require('../utils/notification');
 
 const User = require('../models/user');
 const Project = require('../models/project');
@@ -115,8 +116,19 @@ exports.createProposal = async (req, res, next) => {
     );
 
     await proposal.save();
-    User.decreaseAllowedBids(userId);
-    res.status(200).json({ message: 'Proposal Created!' });
+    await User.decreaseAllowedBids(userId);
+
+    const project = await Project.getProjectById(projectId);
+    const user = await User.getFCMToken(project.owner_id);
+
+    const title = 'Project Update';
+    const body = `${project.title} received a proposal`;
+
+    sendNotification(title, body, user.fcm_token);
+
+    res
+      .status(200)
+      .json({ title: 'Congratulations!', message: 'Proposal Created!' });
   } catch (err) {
     next(err);
   }

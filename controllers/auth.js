@@ -181,6 +181,37 @@ exports.setResetPassword = async (req, res, next) => {
   }
 };
 
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error('Validation Failed');
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const id = req.body.id;
+    const email = req.body.email;
+    const password = req.body.password;
+    const jwtToken = req.body.token;
+
+    const token = jwt.decode(jwtToken, 'snaplancingresetpassworddecode');
+    const hashedPw = await bcrypt.hash(password, 12);
+
+    if (token.id !== id && token.email !== email) {
+      const error = new Error('You are not authorized to change password.');
+      error.statusCode = 401;
+      throw error;
+    }
+    const result = User.forgetPassword(id, hashedPw);
+    res
+      .status(200)
+      .json({ message: 'Password changed Successfully', result: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // exports.getUserStatus = async (req, res, next) => {
 //   try {
 //     const user = await User.findById(req.userId);
