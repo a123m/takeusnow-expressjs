@@ -5,7 +5,6 @@ module.exports = class Project {
     categoryId,
     projectTitle,
     projectDescription,
-    projectStatus,
     ownerId,
     reqSkills,
     reqOn,
@@ -16,7 +15,6 @@ module.exports = class Project {
     (this.category_id = categoryId),
       (this.project_title = projectTitle),
       (this.project_description = projectDescription),
-      (this.project_status = projectStatus),
       (this.owner_id = ownerId),
       (this.req_skills = reqSkills),
       (this.req_on = reqOn),
@@ -27,11 +25,10 @@ module.exports = class Project {
   async save() {
     const result = await db.execute(
       `INSERT INTO SLDB.sl_project (project_title, project_description, project_status, owner_id,req_skills, req_on, country, state, city, budget, created_on, updated_on) 
-      VALUES (?,?,?,?,?,?,101,?,?,?,now(),now())`,
+      VALUES (?,?,1,?,?,?,101,?,?,?,now(),now())`,
       [
         this.project_title,
         this.project_description,
-        this.project_status,
         this.owner_id,
         this.req_skills,
         this.req_on,
@@ -41,12 +38,12 @@ module.exports = class Project {
       ]
     );
 
-    db.execute(
+    await db.execute(
       `INSERT INTO SLDB.sl_project_users (project_id, user_id) VALUE (?,?)`,
       [result[0].insertId, this.owner_id]
     );
 
-    db.execute(
+    await db.execute(
       `INSERT INTO SLDB.sl_project_category (project_id, category_id) VALUE (?,?)`,
       [result[0].insertId, this.category_id]
     );

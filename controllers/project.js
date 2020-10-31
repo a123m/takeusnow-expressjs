@@ -36,7 +36,6 @@ exports.createProject = async (req, res, next) => {
     const categoryId = req.body.categoryId;
     const projectTitle = req.body.projectTitle;
     const projectDescription = req.body.projectDescription;
-    const projectStatus = req.body.projectStatus;
     const ownerId = req.body.ownerId;
     const reqSkills = JSON.stringify(req.body.reqSkills);
     const reqOn = new Date(req.body.reqOn).toISOString();
@@ -48,7 +47,6 @@ exports.createProject = async (req, res, next) => {
       categoryId,
       projectTitle,
       projectDescription,
-      projectStatus,
       ownerId,
       reqSkills,
       reqOn,

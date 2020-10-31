@@ -25,7 +25,6 @@ router.post(
     body('categoryId').isNumeric(),
     body('projectTitle').isString(),
     body('projectDescription').isString(),
-    body('projectStatus').isString(),
     body('ownerId').isNumeric(),
     body('reqSkills').isArray(),
     body('reqOn').isString(),
