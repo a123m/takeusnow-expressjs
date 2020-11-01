@@ -91,6 +91,13 @@ exports.updateProject = async (req, res, next) => {
     const projectId = req.params.projectId;
     const status = req.query.status;
 
+    // const user = await User.getFCMToken(project.owner_id);
+    // sendNotification(
+    //   'Congratulation',
+    //   `Your Proposal is accepted.`,
+    //   user.fcm_token
+    // );
+
     await Project.updateProjectById(projectId, status);
 
     res.status(200).json({ message: 'Status updated' });
@@ -119,6 +126,7 @@ exports.createReview = async (req, res, next) => {
     const project = await Project.getProjectById(projectId);
 
     if (accountType === 'work') {
+      await Project.updateReviewStatus('worker_review', projectId);
       const review = new Review(
         project.owner_id,
         reviewerUserId,
@@ -129,9 +137,10 @@ exports.createReview = async (req, res, next) => {
     }
 
     if (accountType === 'hire') {
+      await Project.updateReviewStatus('owner_review', projectId);
       const proposal = await Proposal.getProposalById(project.ap_id);
       const review = new Review(
-        proposal.owner_id,
+        proposal.user_id,
         reviewerUserId,
         description,
         rating

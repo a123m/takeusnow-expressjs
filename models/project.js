@@ -80,7 +80,7 @@ module.exports = class Project {
 
   static async getProjectById(projectId) {
     const result = await db.execute(
-      `SELECT project_id, project_title, project_description, sl_status.project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, sl_state.state_name as state_name, code, sl_cities.city_name as city_name FROM SLDB.sl_project 
+      `SELECT project_id, project_title, project_description, sl_status.project_status, owner_id, created_on, updated_on, req_skills, req_on, budget, ap_id, sl_state.state_name as state_name, code, sl_cities.city_name as city_name, owner_review, worker_review FROM SLDB.sl_project 
       LEFT JOIN SLDB.sl_state ON sl_state.state_id = sl_project.state 
       LEFT JOIN SLDB.sl_cities ON sl_cities.id = sl_project.city 
       LEFT JOIN SLDB.sl_status ON sl_status.status_id = sl_project.project_status
@@ -91,7 +91,7 @@ module.exports = class Project {
 
   static async getProjectsByUserId(userId) {
     const result = await db.execute(
-      `SELECT pu_id, P.project_id, user_id, PU.project_id, project_title, project_description, country, req_skills, s.project_status, state, city, budget, owner_id, created_on, updated_on, req_on, ap_id, status_id, description FROM SLDB.sl_project_users AS PU 
+      `SELECT pu_id, P.project_id, user_id, PU.project_id, project_title, project_description, country, req_skills, s.project_status, state, city, budget, owner_id, created_on, updated_on, req_on, ap_id, status_id, description, owner_review, worker_review FROM SLDB.sl_project_users AS PU 
       LEFT JOIN SLDB.sl_project AS P ON PU.project_id = P.project_id LEFT JOIN SLDB.sl_status AS s ON s.status_id = P.project_status
       WHERE PU.user_id = ?`,
       [userId]
@@ -133,5 +133,12 @@ module.exports = class Project {
       [projectId]
     );
     return result[0][0];
+  }
+
+  static async updateReviewStatus(reviewer, projectId) {
+    return db.execute(
+      `UPDATE SLDB.sl_project SET ${reviewer} = ? WHERE project_id = ?`,
+      [1, projectId]
+    );
   }
 };
