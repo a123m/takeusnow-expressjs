@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 
-const User = require('../models/user');
+// const User = require('../models/user');
 const Review = require('../models/review');
 
 exports.getMainData = async (req, res, next) => {
@@ -20,11 +20,11 @@ exports.getMainData = async (req, res, next) => {
     const reviews = await Review.getReviewsByUserId(userId, offset, limit);
 
     if (!req.query.page && !req.query.limit) {
-      const user = await User.fetchAllById(userId);
+      // const user = await User.fetchAllById(userId);
       res.status(200).json({
-        average_reviews: user.average_reviews,
-        total_reviews: user.total_reviews,
-        reviews: reviews,
+        average_reviews: reviews.average_reviews,
+        total_reviews: reviews.total_reviews,
+        reviews: reviews.reviews,
       });
     } else {
       res.status(200).json(reviews);
