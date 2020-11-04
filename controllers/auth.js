@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mailer = require('../middleware/mailer');
+const Plan = require('../models/plan');
 
 const User = require('../models/user');
 
@@ -33,6 +34,8 @@ exports.signup = async (req, res, next) => {
     const accountType = req.body.accountType;
     const accountTypeSub = req.body.accountTypeSub;
     const mobileNum = req.body.mobileNum;
+
+
     /**
      * always create new object with new data to store in DB
      */
@@ -47,6 +50,7 @@ exports.signup = async (req, res, next) => {
       mobileNum
     );
     const result = await user.save();
+    await Plan.purchasePlan(1, result[0].insertId);
     res
       .status(200)
       .json({ message: 'User created!', user_id: result[0].insertId });

@@ -8,7 +8,9 @@ const router = express.Router();
 
 router.get("/get", planController.getPlanData);
 
-router.get("/get/:user_id", isAuth, param('user_id').isNumeric(), planController.getPlanById);
+router.get("/get/:user_id",
+    // isAuth, 
+    param('user_id').isNumeric(), planController.getPlanById);
 
 router.patch("/update", isAuth, [body('plan_id').isNumeric(), body('user_id').isNumeric()], planController.updatePlan)
 
