@@ -57,7 +57,7 @@ module.exports = class User {
       `SELECT able_to_travel, about, account_type, account_type_sub, active_projects, 
       allowed_bids, average_reviews, city, city_name, deleted, dob, email, email_verify, 
       fcm_token, fname, gender, languages_known, lname, mobile_num, my_equipments, my_skills, 
-       state, state_name, total_reviews, user_id, user_image, work_experience, plan_name 
+       state, state_name, total_reviews, user_id, user_image, work_experience, plan_name, plan_in_use 
        FROM SLDB.sl_users 
       LEFT JOIN SLDB.sl_state ON SLDB.sl_state.state_id = SLDB.sl_users.state 
       LEFT JOIN SLDB.sl_cities ON SLDB.sl_cities.id = SLDB.sl_users.city 

@@ -13,7 +13,7 @@ const reviewRoutes = require('./routers/review');
 const validationRoutes = require('./routers/validation');
 const worldDataRoutes = require('./routers/worldCountry');
 const notificationsRoutes = require('./routers/notifications');
-const PlanRoutes = require('./routers/plan');
+const planRoutes = require('./routers/plan');
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,7 +41,7 @@ app.use('/reviews', reviewRoutes);
 app.use('/validation', validationRoutes);
 app.use('/worlddata', worldDataRoutes);
 app.use('/notifications', notificationsRoutes);
-app.use('/plan', PlanRoutes);
+app.use('/plan', planRoutes);
 
 app.get('/', (req, res) => {
   res.status(200).send('<h1>hello</h1>');
