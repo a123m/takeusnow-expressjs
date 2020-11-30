@@ -4,6 +4,7 @@ const { body } = require('express-validator');
 const authController = require('../controllers/auth');
 // const isAuth = require('../middleware/is-auth');
 const User = require('../models/user');
+
 const router = express.Router();
 
 router.use(express.static(__dirname + './assets/'));
@@ -66,5 +67,15 @@ router.get('/forget', (req, res) => {
       '<form method= "post" action="/validation/emailval"> <label> Enter new password </label> <input class="form-control" id="email" name="email" placeholder="email" type="text" > <label> Confirm new password </label> <input class="form-control" id="userID" name="userID" placeholder="email" type="text" > <button type="submit" >register</button> </form>'
     );
 });
+
+router.post(
+  '/refreshtoken',
+  [
+    body('token').isAlphanumeric(),
+    // body("password").isAlphanumeric(),
+    // body("token").isAlphanumeric(),
+  ],
+  authController.refreshToken
+);
 
 module.exports = router;

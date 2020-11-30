@@ -1,8 +1,10 @@
 const { validationResult } = require('express-validator');
+const { sendNotification } = require('../utils/notification');
 
 const Project = require('../models/project');
 const Review = require('../models/review');
 const Proposal = require('../models/proposal');
+const User = require('../models/user');
 
 exports.getMainData = async (req, res, next) => {
   try {
@@ -34,7 +36,6 @@ exports.createProject = async (req, res, next) => {
     const categoryId = req.body.categoryId;
     const projectTitle = req.body.projectTitle;
     const projectDescription = req.body.projectDescription;
-    const projectStatus = req.body.projectStatus;
     const ownerId = req.body.ownerId;
     const reqSkills = JSON.stringify(req.body.reqSkills);
     const reqOn = new Date(req.body.reqOn).toISOString();
@@ -46,7 +47,6 @@ exports.createProject = async (req, res, next) => {
       categoryId,
       projectTitle,
       projectDescription,
-      projectStatus,
       ownerId,
       reqSkills,
       reqOn,
@@ -91,6 +91,13 @@ exports.updateProject = async (req, res, next) => {
     const projectId = req.params.projectId;
     const status = req.query.status;
 
+    // const user = await User.getFCMToken(project.owner_id);
+    // sendNotification(
+    //   'Congratulation',
+    //   `Your Proposal is accepted.`,
+    //   user.fcm_token
+    // );
+
     await Project.updateProjectById(projectId, status);
 
     res.status(200).json({ message: 'Status updated' });
@@ -119,6 +126,7 @@ exports.createReview = async (req, res, next) => {
     const project = await Project.getProjectById(projectId);
 
     if (accountType === 'work') {
+      await Project.updateReviewStatus('worker_review', projectId);
       const review = new Review(
         project.owner_id,
         reviewerUserId,
@@ -129,9 +137,10 @@ exports.createReview = async (req, res, next) => {
     }
 
     if (accountType === 'hire') {
+      await Project.updateReviewStatus('owner_review', projectId);
       const proposal = await Proposal.getProposalById(project.ap_id);
       const review = new Review(
-        proposal.owner_id,
+        proposal.user_id,
         reviewerUserId,
         description,
         rating
@@ -140,6 +149,41 @@ exports.createReview = async (req, res, next) => {
     }
 
     res.status(200).json({ message: 'Review Saved' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.catAndSubCat = async (req, res, next) => {
+  try {
+    const categories = await Project.getAllCat();
+    const subCat = await Project.getAllSubCat();
+
+    if (!categories || !subCat) {
+      const error = new Error('Category or Sub-Category Not Found!!');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({ categories: categories, sub_categories: subCat });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.acceptProposal = async (req, res, next) => {
+  try {
+    const projectId = req.params.projectId;
+    const proposalId = req.params.proposalId;
+    const proposal = await Proposal.getProposalById(proposalId);
+    await Project.acceptProposal(projectId, proposalId, proposal.user_id);
+    const user = await User.getFCMToken(proposal.user_id);
+
+    sendNotification(
+      'Congratulation',
+      `Your Proposal is accepted.`,
+      user.fcm_token
+    );
   } catch (err) {
     next(err);
   }

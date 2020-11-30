@@ -54,7 +54,15 @@ module.exports = class User {
 
   static async fetchAllById(id) {
     const result = await db.execute(
-      `SELECT * FROM SLDB.sl_users WHERE user_id = ?`,
+      `SELECT able_to_travel, about, account_type, account_type_sub, active_projects, 
+      allowed_bids, average_reviews, city, city_name, deleted, dob, email, email_verify, 
+      fcm_token, fname, gender, languages_known, lname, mobile_num, my_equipments, my_skills, 
+       state, state_name, total_reviews, user_id, user_image, work_experience, plan_name, plan_in_use 
+       FROM SLDB.sl_users 
+      LEFT JOIN SLDB.sl_state ON SLDB.sl_state.state_id = SLDB.sl_users.state 
+      LEFT JOIN SLDB.sl_cities ON SLDB.sl_cities.id = SLDB.sl_users.city 
+      LEFT JOIN SLDB.sl_plan ON SLDB.sl_plan.plan_id = SLDB.sl_users.plan_in_use
+      WHERE user_id = ?`,
       [id]
     );
     return result[0][0];
@@ -86,13 +94,14 @@ module.exports = class User {
     mySkills,
     workExperience
   ) {
-    const result = await db.execute(
+    await db.execute(
       `UPDATE SLDB.sl_users SET about = '${about}', able_to_travel = '${ableToTravel}', 
       state = '${state}', city = '${city}', dob = '${dateOfBirth}', languages_known = '${languagesKnown}', 
       my_equipments = '${myEquipments}', my_skills = '${mySkills}', work_experience = '${workExperience}' 
       WHERE user_id = ${userId}`
     );
-    return result[0];
+    const result = await this.fetchAllById(userId);
+    return result;
   }
 
   static async forgetPassword(userId, password) {
@@ -122,5 +131,47 @@ module.exports = class User {
       [firebaseToken, userId]
     );
     return result[0];
+  }
+
+  // * Get bids of the user
+  static async getBids(userId) {
+    const result = await db.execute(
+      `SELECT plan_name AS plan_in_use, allowed_bids FROM SLDB.sl_users LEFT JOIN SLDB.sl_plan ON sl_plan.plan_id = sl_users.plan_in_use WHERE user_id = ?`,
+      [userId]
+    );
+    return result[0][0];
+  }
+
+  static async getFilteredUsers(categoryId, offset, limit) {
+    const result = await db.execute(
+      `SELECT * FROM SLDB.sl_users AS U 
+      LEFT JOIN SLDB.sl_user_categories AS UC ON UC.user_id = U.user_id 
+      WHERE UC.cat_id = ? 
+      ORDER BY average_reviews DESC LIMIT ?,?`,
+      [categoryId, offset, limit]
+    );
+    return result[0];
+  }
+
+  static async updateCategory(myCategories, userId) {
+    await db.execute(`DELETE FROM SLDB.sl_user_categories WHERE user_id = ?`, [
+      userId,
+    ]);
+    myCategories.forEach((item) => {
+      db.execute(
+        `INSERT INTO SLDB.sl_user_categories 
+          (user_id, cat_id) 
+          VALUES (?,?)`,
+        [userId, item]
+      );
+    });
+  }
+
+  static async getFCMToken(userId) {
+    const result = await db.execute(
+      `SELECT fcm_token from SLDB.sl_users WHERE user_id = ?`,
+      [userId]
+    );
+    return result[0][0];
   }
 };

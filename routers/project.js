@@ -9,25 +9,32 @@ const router = express.Router();
 
 router.get('/:userId', isAuth, projectController.getMainData);
 
+router.get('/categories/all', isAuth, projectController.catAndSubCat);
+
+router.get('/update/:projectId', isAuth, projectController.updateProject);
+
+router.get(
+  '/:projectId/proposal/:proposalId',
+  isAuth,
+  projectController.acceptProposal
+);
+
 router.post(
   '/create',
   [
     body('categoryId').isNumeric(),
     body('projectTitle').isString(),
     body('projectDescription').isString(),
-    body('projectStatus').isString(),
     body('ownerId').isNumeric(),
     body('reqSkills').isArray(),
     body('reqOn').isString(),
-    body('state').isString(),
-    body('city').isString(),
+    body('state').isNumeric(),
+    body('city').isNumeric(),
     body('budget').isNumeric(),
   ],
   isAuth,
   projectController.createProject
 );
-
-router.get('/update/:projectId', isAuth, projectController.updateProject);
 
 router.post(
   '/review',

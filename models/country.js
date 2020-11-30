@@ -1,11 +1,7 @@
 const db = require('../utils/database');
 
-module.exports = class Portfolio {
-  constructor(userId, imageName, imageUrl) {
-    (this.user_id = userId),
-      (this.image_name = imageName),
-      (this.image_url = imageUrl);
-  }
+module.exports = class Country {
+  constructor() { }
 
   static async getCountry() {
     const result = await db.execute(`SELECT * FROM SLDB.sl_country;`);

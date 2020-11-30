@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator');
+const { sendNotification } = require('../utils/notification');
 
 const User = require('../models/user');
 const Project = require('../models/project');
@@ -33,21 +34,16 @@ exports.getMainData = async (req, res, next) => {
         offSet,
         limit
       );
-      if (projects.length === 0) {
-        const error = new Error(
-          'No active project available of this category!'
-        );
-        error.statusCode = 404;
-        throw error;
-      }
       res.status(200).json(projects);
     }
 
-    /**
-     * will be modified in future
-     */
     if (type === 'hire') {
-      const users = await User.fetchAUsers(offSet, limit);
+      const users = await User.getFilteredUsers(categoryId, offSet, limit);
+      if (users.length === 0) {
+        const error = new Error('No active users available of this category!');
+        error.statusCode = 404;
+        throw error;
+      }
       res.status(200).json(users);
     }
   } catch (err) {
@@ -113,8 +109,44 @@ exports.createProposal = async (req, res, next) => {
     );
 
     await proposal.save();
-    User.decreaseAllowedBids(userId);
-    res.status(200).json({ message: 'Proposal Created!' });
+    await User.decreaseAllowedBids(userId);
+
+    const project = await Project.getProjectById(projectId);
+    const user = await User.getFCMToken(project.owner_id);
+
+    const title = 'Project Update';
+    const body = `${project.title} received a proposal`;
+
+    sendNotification(title, body, user.fcm_token);
+
+    res
+      .status(200)
+      .json({ title: 'Congratulations!', message: 'Proposal Created!' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getBids = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error('Entered Data is Incorrect');
+      error.statusCode = 422;
+      error.data = errors.array();
+      throw error;
+    }
+
+    const userId = req.params.userId;
+
+    const allowedBids = await User.getBids(userId);
+
+    if (!allowedBids) {
+      const error = new Error('No Bids found');
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).json(allowedBids);
   } catch (err) {
     next(err);
   }

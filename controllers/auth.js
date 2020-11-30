@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mailer = require('../middleware/mailer');
+const Plan = require('../models/plan');
 
 const User = require('../models/user');
 
@@ -33,6 +34,8 @@ exports.signup = async (req, res, next) => {
     const accountType = req.body.accountType;
     const accountTypeSub = req.body.accountTypeSub;
     const mobileNum = req.body.mobileNum;
+
+
     /**
      * always create new object with new data to store in DB
      */
@@ -47,6 +50,7 @@ exports.signup = async (req, res, next) => {
       mobileNum
     );
     const result = await user.save();
+    await Plan.purchasePlan(1, result[0].insertId);
     res
       .status(200)
       .json({ message: 'User created!', user_id: result[0].insertId });
@@ -76,8 +80,7 @@ exports.login = async (req, res, next) => {
       error.statusCode = 401;
       throw error;
     }
-
-    if (!user.status) {
+    if (user.email_verify == 0) {
       const error = new Error('Please verify your E-mail!');
       error.statusCode = 401;
       throw error;
@@ -152,6 +155,37 @@ exports.passwordReset = async (req, res, next) => {
 };
 
 exports.setResetPassword = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error('Validation Failed');
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const id = req.body.id;
+    const email = req.body.email;
+    const password = req.body.password;
+    const jwtToken = req.body.token;
+
+    const token = jwt.decode(jwtToken, 'snaplancingresetpassworddecode');
+    const hashedPw = await bcrypt.hash(password, 12);
+
+    if (token.id !== id && token.email !== email) {
+      const error = new Error('You are not authorized to change password.');
+      error.statusCode = 401;
+      throw error;
+    }
+    const result = User.forgetPassword(id, hashedPw);
+    res
+      .status(200)
+      .json({ message: 'Password changed Successfully', result: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.refreshToken = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
